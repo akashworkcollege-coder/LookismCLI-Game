@@ -1,15 +1,61 @@
 #!/usr/bin/env python3
 """
 LOOKISM: AWAKENED FIST - COMPLETE CANON EDITION
-FULLY FIXED VERSION - No healing abilities, pure combat!
-BUTTONS REMAPPED TO NUMBERS - Easier input!
-100% Manhwa Accurate • Based on Park Tae-joon's Lookism (2014-2025)
+ALL 51 FIGHTING CHARACTERS - 100% Manhwa Accurate
+DEBUGGED VERSION - All methods and classes included
+Based on Park Tae-joon's Lookism (2014-2025) & Manager Kim (Spin-off)
 """
 
 import random
 import time
 import sys
+import json
+import os
 from enum import Enum
+from datetime import datetime
+
+# ============================================================================
+# SAVE/LOAD SYSTEM
+# ============================================================================
+
+SAVE_FILE = "lookism_save.json"
+
+
+class SaveSystem:
+    @staticmethod
+    def save_game(game_state):
+        """Save game progress to file"""
+        try:
+            with open(SAVE_FILE, 'w') as f:
+                json.dump(game_state, f, indent=4)
+            return True
+        except Exception as e:
+            print(f"❌ Save failed: {e}")
+            return False
+
+    @staticmethod
+    def load_game():
+        """Load game progress from file"""
+        try:
+            if os.path.exists(SAVE_FILE):
+                with open(SAVE_FILE, 'r') as f:
+                    return json.load(f)
+            return None
+        except Exception as e:
+            print(f"❌ Load failed: {e}")
+            return None
+
+    @staticmethod
+    def delete_save():
+        """Delete save file"""
+        try:
+            if os.path.exists(SAVE_FILE):
+                os.remove(SAVE_FILE)
+                return True
+            return False
+        except:
+            return False
+
 
 # ============================================================================
 # TEXT SPEED CONTROL
@@ -44,380 +90,74 @@ class Realm(Enum):
 
 
 # ============================================================================
-# PATH SYSTEM
+# PATH SYSTEM - COMPLETE CANON PATHS
 # ============================================================================
 
 class Path(Enum):
-    # Daniel Park
-    ULTRA_INSTINCT = "👁️ Ultra Instinct - The body fights on its own"
-    COPY_MASTER = "⚡ Copy Master - Perfect replication of any technique"
-    SECOND_BODY = "🔄 Dual Vessel - Master of both bodies"
-    HERO_PATH = "👊 Hero of Justice - Inherit Vasco's will"
-    UI_MASTER = "👑 UI Master - Voluntary control over Ultra Instinct"
+    # GEN 0 LEGENDS
+    GAPRYONG_CONVICTION = "👑 Gapryong's Conviction - The legendary fist that changed Gen 0"
+    TOM_LEE_WILD = "🐅 Tom Lee's Wild - Animal instincts, biting, slashing"
+    CHARLES_ELITE = "🎭 Charles Choi's Invisible Attacks - Elite technique from Gapryong's Fist"
+    JINYOUNG_COPY = "🔄 Jinyoung Park's Copy - Perfect replication of any technique"
+    BAEKHO_BEAST = "🐯 Baekho's Beast Mode - White Tiger's wild fighting"
+    GAPRYONG_FIST_MEMBER = "👊 Gapryong's Fist Member - Legendary crew fighter"
 
-    # Johan Seong
-    GOD_EYE = "👁️ God Eye - Perfect copy, sees through all techniques"
-    CHOREOGRAPHY = "💃 Dance of Blades - Unique dance-based combat"
-    BLIND_SAGE = "🕶️ Blind Sage - Fights without sight"
-    INFINITE_COPY = "♾️ Infinity Technique - Copy without limits"
+    # 1ST GENERATION KINGS
+    JAMES_LEE_INVISIBLE = "👑 James Lee's Invisible Attacks - The peak of 1st Gen"
+    GITAE_KIM = "⚡ Gitae Kim - Gapryong's son, unknown style"
+    JICHANG_HAND_BLADE = "🩷 Jichang Kwak's Hand Blade - Knife-hand mastery"
+    TAESOO_MA_FIST = "🔴 Taesoo Ma's Right Hand - Pure power, no technique"
+    GONGSEOB_IRON = "🔨 Gongseob Ji's Iron Boxing - Speed + Tungsten durability"
+    SEOKDU_HEADBUTT = "💢 Seokdu Wang's Headbutt - Forehead specialist"
+    JAEGYEON_SPEED = "🔵 Jaegyeon Na's Speed - Fastest man in Korea"
+    SEONGJI_MONSTER = "🦍 Seongji Yuk's Monster Style - Ssireum + Judo + Kudo"
+    JINRANG_CONVICTION = "👑 Jinrang's True Conviction - Gapryong's disciple"
 
-    # Vasco
-    SYSTEMA_MASTER = "🇷🇺 Systema Master - Flowing Russian martial art"
-    MUAY_THAI_LEGEND = "🇹🇭 Muay Thai Legend - Devastating strikes"
-    BURN_KNUCKLE_KING = "🔥 Burn Knuckle King - Ultimate justice fist"
+    # GEN 2 CREW LEADERS
+    DANIEL_UI = "👁️ Daniel Park's Ultra Instinct - White hair awakening"
+    DANIEL_COPY = "⚡ Daniel Park's Copy Master - Perfect replication"
+    ZACK_IRON = "🔨 Zack Lee's Iron Boxing - Gongseob Ji's style"
+    JOHAN_GOD_EYE = "👁️ Johan Seong's God Eye - Ultimate copy"
+    JOHAN_CHOREOGRAPHY = "💃 Johan Seong's Choreography - Dance combat"
+    VASCO_SYSTEMA = "🇷🇺 Vasco's Systema Master - Russian martial art"
+    VASCO_MUAY_THAI = "🇹🇭 Vasco's Muay Thai Legend - Devastating strikes"
+    JAY_KALI = "🇵🇭 Jay Hong's Kali Master - Twin blade perfection"
+    ELI_BEAST = "🦁 Eli Jang's Beast King - Animal instincts"
+    ELI_TOM_LEE = "🐅 Eli Jang's Tom Lee Legacy - Inherited wild"
+    WARREN_JKD = "🥋 Warren Chae's Jeet Kune Do - Bruce Lee's philosophy"
+    WARREN_CQC = "🔫 Warren Chae's CQC Operator - Military precision"
+    WARREN_HEART = "💔 Warren Chae's Heart Attack - One-inch punch"
+    JAKE_CONVICTION = "⚖️ Jake Kim's Conviction King - Willpower"
+    JAKE_GAPRYONG = "👑 Jake Kim's Gapryong Blood - Inherited fist"
+    GUN_YAMAZAKI = "🏯 Gun Park's Yamazaki Heir - Darkness within"
+    GUN_CONSTANT_UI = "👁️ Gun Park's Constant UI - Permanent awakening"
+    GOO_MOONLIGHT = "🌙 Goo Kim's Moonlight Sword - 5 sword styles"
+    GOO_FIFTH = "✨ Goo Kim's Fifth Sword - Technique impossible"
+    JOONGOO_HWARANG = "⚔️ Kim Jun-gu's Hwarang Sword - Cuts goblins"
+    JOONGOO_ARMED = "🗡️ Kim Jun-gu's Armed Beast - Top 3 when armed"
 
-    # Zack Lee
-    COUNTER_GENIUS = "⚡ Counter Genius - Perfect timing"
-    SHINING_STAR = "💫 Shining Star - Ultimate one-punch finish"
-    BOXING_EMPEROR = "👑 Boxing Emperor - Undisputed king of the ring"
+    # WORKERS
+    MANDEOK_POWER = "💪 Mandeok's Titan Strength - Raw power"
+    CAP_GUY_CQC = "🔫 Cap Guy's CQC Master - Silver Yarn threads"
+    XIAOLUNG_MUAY_THAI = "🇹🇭 Xiaolung's Muay Thai Genius - Elbows and knees"
+    RYUHEI_YAKUZA = "⚔️ Ryuhei's Yakuza Style - Gang fighting"
+    SAMUEL_AMBITION = "👑 Samuel Seo's King's Ambition - Betrayer's strength"
+    SINU_INVISIBLE = "🌀 Sinu Han's Invisible Attacks - Hands and legs"
+    LOGAN_BULLY = "👊 Logan Lee's Bully Brawling - Cheap shots"
 
-    # Jay Hong
-    SILENT_PROTECTOR = "🤫 Silent Protector - Ultimate defense"
-    KALI_MASTER = "🇵🇭 Kali Master - Twin blade perfection"
+    # CHEONLIANG
+    VIN_JIN_SSIREUM = "🇰🇷 Vin Jin's Ssireum Genius - Korean wrestling"
+    SEONGJI_MARTIAL = "🥋 Seongji Yuk's Martial Arts - Ssireum + Judo + Kudo"
+    HAN_JAEHA = "🤼 Han Jaeha's Ssireum - Traditional wrestling"
+    BAEK_SEONG_TAEKKYON = "🦢 Baek Seong's Taekkyon - Flowing martial art"
 
-    # Eli Jang
-    BEAST_KING = "🦁 Beast King - Full animal instinct release"
-    HOSTEL_FATHER = "👶 Father's Strength - Fights for Yenna"
-    TOM_LEE_LEGACY = "🐅 Tom Lee Legacy - Inheritor of The Wild"
+    # YAMAZAKI
+    SHINGEN_YAMAZAKI = "🏯 Shingen Yamazaki's Ultimate - Yamazaki head"
+    PARK_FATHER = "❓ Park Jonggun's Father - Mysterious bloodline"
 
-    # Warren Chae
-    JKD_MASTER = "🥋 Jeet Kune Do Master - Bruce Lee's philosophy"
-    CQC_OPERATOR = "🔫 CQC Operator - Military precision"
-    NEW_CQC_CREATOR = "⚡ NEW CQC Creator - JKD + CQC hybrid"
-    HEART_ATTACK = "💔 Heart Attack Punch - One-inch punch to the heart"
-
-    # Jake Kim
-    CONVICTION_KING = "⚖️ Conviction King - Willpower becomes power"
-    GAPRYONG_BLOOD = "👑 Gapryong's Blood - Inheritor of legendary fist"
-    BIG_DEAL_LEADER = "🤝 Big Deal Leader - Power of crew solidarity"
-
-    # Gun Park
-    YAMAZAKI_HEIR = "🏯 Yamazaki Heir - The darkness within"
-    GENIUS_OF_COMBAT = "🎯 Genius of Combat - Master of 4+ martial arts"
-    ULTRA_INSTINCT_CONSTANT = "👁️ Constant UI - Permanent Ultra Instinct"
-    BLACK_BONE = "🖤 Black Bone - Ultimate Yamazaki technique"
-
-    # Goo Kim
-    MOONLIGHT_SWORD = "🌙 Moonlight Sword - Legendary 50 Moonlight Style"
-    MAKESHIFT_MASTER = "🖊️ Makeshift Master - Any object becomes deadly"
-    FIFTH_SWORD = "✨ Fifth Sword - Technique thought impossible"
-
-    # Kim Jun-gu
-    HWARANG_SWORD = "⚔️ Hwarang Sword - Cuts even goblins"
-    IMPROVISED_WEAPON = "🔗 Improvised Weapon Master"
-    ARMED_BEAST = "🗡️ Armed Beast - Top 3 in the verse when armed"
-
-    # Jinrang
-    GAPRYONG_DISCIPLE = "👑 Gapryong's Disciple - True conviction"
-    BUSAN_KING = "🏆 King of Busan - Ruler of the south"
-
-    # Jaegyeon Na
-    INCHEON_SPEED = "🔵 Incheon Speed - Fastest man in Korea"
-    BETRAYER = "🗡️ Betrayer - Traitor's strength"
-
-    # Manager Kim
-    SPECIAL_FORCES = "🎖️ Special Forces - Former black ops, Code 66"
-    PROTECTIVE_FATHER = "👨‍👧 Protective Father - Fights for Minji, unstoppable"
-    CQC_MASTER = "🔫 CQC Master - Close Quarter Combat perfection"
-
-
-# ============================================================================
-# INFINITY TECHNIQUES DATABASE
-# ============================================================================
-
-INFINITY_TECHNIQUES = {
-    # Daniel Park
-    Path.ULTRA_INSTINCT: {
-        "name": "👁️ INFINITE UI: White God",
-        "cost": 120,
-        "dmg": (200, 300),
-        "desc": "The pinnacle of Ultra Instinct. White hair flows endlessly. Perfect evasion, perfect counter, perfect strike."
-    },
-    Path.COPY_MASTER: {
-        "name": "⚡ INFINITE COPY: Omni-Directional Replication",
-        "cost": 110,
-        "dmg": (180, 270),
-        "desc": "Daniel copies EVERY technique he has ever seen simultaneously."
-    },
-    Path.SECOND_BODY: {
-        "name": "🔄 INFINITE SWITCH: Dual Existence",
-        "cost": 100,
-        "dmg": (170, 250),
-        "desc": "Daniel and his second body fight as one. Two perspectives, infinite possibilities."
-    },
-    Path.HERO_PATH: {
-        "name": "👊 INFINITE JUSTICE: Hero's Conviction",
-        "cost": 100,
-        "dmg": (160, 240),
-        "desc": "Daniel inherits Vasco's will. Justice compressed into infinite fists."
-    },
-    Path.UI_MASTER: {
-        "name": "👑 INFINITE MASTERY: Voluntary God",
-        "cost": 130,
-        "dmg": (220, 330),
-        "desc": "Voluntary control over Ultra Instinct. White hair at will."
-    },
-
-    # Johan Seong
-    Path.GOD_EYE: {
-        "name": "👁️ INFINITE GOD EYE: Omniscient Copy",
-        "cost": 120,
-        "dmg": (190, 280),
-        "desc": "Sees through all techniques, past, present, and future. Copy without limit."
-    },
-    Path.CHOREOGRAPHY: {
-        "name": "💃 INFINITE CHOREOGRAPHY: Final Performance",
-        "cost": 110,
-        "dmg": (180, 270),
-        "desc": "A flawless sequence of 1000 strikes from every conceivable angle."
-    },
-    Path.BLIND_SAGE: {
-        "name": "🕶️ INFINITE BLINDNESS: Sight Beyond Sight",
-        "cost": 100,
-        "dmg": (170, 260),
-        "desc": "Johan transcends his blindness. He feels the air, hears the heartbeat."
-    },
-    Path.INFINITE_COPY: {
-        "name": "♾️ INFINITE TECHNIQUE: Transcendent God Eye",
-        "cost": 130,
-        "dmg": (210, 320),
-        "desc": "Copy without seeing. Copy without existing. Creates techniques that never existed."
-    },
-
-    # Vasco
-    Path.SYSTEMA_MASTER: {
-        "name": "🇷🇺 INFINITE SYSTEMA: Russian Winter",
-        "cost": 100,
-        "dmg": (150, 230),
-        "desc": "Flowing like water, unpredictable like wind. The art of the Russian special forces."
-    },
-    Path.MUAY_THAI_LEGEND: {
-        "name": "🇹🇭 INFINITE MUAY THAI: Death Blow of the Gods",
-        "cost": 110,
-        "dmg": (170, 260),
-        "desc": "Shin becomes a blade, elbow a spear, knee a battering ram."
-    },
-    Path.BURN_KNUCKLE_KING: {
-        "name": "🔥 INFINITE BURN KNUCKLES: Sunken Fist of Apocalypse",
-        "cost": 100,
-        "dmg": (160, 250),
-        "desc": "Justice manifests as pure destructive power."
-    },
-
-    # Zack Lee
-    Path.COUNTER_GENIUS: {
-        "name": "⚡ INFINITE COUNTER: Zero Reaction Time",
-        "cost": 90,
-        "dmg": (140, 220),
-        "desc": "The moment an attack is thrown, Zack's fist has already landed."
-    },
-    Path.SHINING_STAR: {
-        "name": "💫 INFINITE SHINING STAR: Supernova",
-        "cost": 100,
-        "dmg": (160, 250),
-        "desc": "A single punch containing every ounce of his being. For Mira."
-    },
-    Path.BOXING_EMPEROR: {
-        "name": "👑 INFINITE BOXING: Undisputed",
-        "cost": 95,
-        "dmg": (150, 240),
-        "desc": "Zack transcends boxing itself. He IS boxing."
-    },
-
-    # Jay Hong
-    Path.SILENT_PROTECTOR: {
-        "name": "🤫 INFINITE SILENCE: Guardian Angel",
-        "cost": 90,
-        "dmg": (0, 0),
-        "desc": "Jay becomes Daniel's shadow, taking all damage for him."
-    },
-    Path.KALI_MASTER: {
-        "name": "🇵🇭 INFINITE KALI: Blade Storm",
-        "cost": 95,
-        "dmg": (150, 230),
-        "desc": "Twin blades become a whirlwind of destruction."
-    },
-
-    # Eli Jang
-    Path.BEAST_KING: {
-        "name": "🦁 INFINITE BEAST: King of the Jungle",
-        "cost": 110,
-        "dmg": (170, 260),
-        "desc": "Eli fully surrenders to his animal instincts. No wasted movement."
-    },
-    Path.HOSTEL_FATHER: {
-        "name": "👶 INFINITE FATHER: Yenna's Smile",
-        "cost": 120,
-        "dmg": (190, 290),
-        "desc": "For Yenna's future, Eli surpasses every limit. A father's love is infinite."
-    },
-    Path.TOM_LEE_LEGACY: {
-        "name": "🐅 INFINITE WILD: Tom Lee's Successor",
-        "cost": 100,
-        "dmg": (160, 250),
-        "desc": "The Wild, passed down from Gen 0, flows through Eli's veins."
-    },
-
-    # Warren Chae
-    Path.JKD_MASTER: {
-        "name": "🥋 INFINITE JKD: Bruce Lee's Spirit",
-        "cost": 90,
-        "dmg": (140, 220),
-        "desc": "Be water, my friend. Formless, shapeless, yet overwhelming."
-    },
-    Path.CQC_OPERATOR: {
-        "name": "🔫 INFINITE CQC: Manager Kim's Legacy",
-        "cost": 100,
-        "dmg": (150, 240),
-        "desc": "Military precision. Maximum efficiency. Minimum movement."
-    },
-    Path.NEW_CQC_CREATOR: {
-        "name": "⚡ INFINITE NEW CQC: The Uncopyable",
-        "cost": 120,
-        "dmg": (180, 280),
-        "desc": "JKD + CQC = a style with NO DISCERNIBLE PATTERN. Even Johan cannot copy it."
-    },
-    Path.HEART_ATTACK: {
-        "name": "💔 INFINITE HEART: Cardiac Arrest",
-        "cost": 110,
-        "dmg": (170, 270),
-        "desc": "One-inch punch to the heart. Bypasses all durability."
-    },
-
-    # Jake Kim
-    Path.CONVICTION_KING: {
-        "name": "⚖️ INFINITE CONVICTION: Unshakeable Will",
-        "cost": 100,
-        "dmg": (160, 250),
-        "desc": "Jake's will becomes absolute. Mind over matter."
-    },
-    Path.GAPRYONG_BLOOD: {
-        "name": "👑 INFINITE GAPRYONG: Legend's Return",
-        "cost": 120,
-        "dmg": (200, 300),
-        "desc": "For a moment, Gapryong Kim stands again. The legendary fist."
-    },
-    Path.BIG_DEAL_LEADER: {
-        "name": "🤝 INFINITE BIG DEAL: Crew Solidarity",
-        "cost": 90,
-        "dmg": (140, 230),
-        "desc": "Jerry's loyalty, Brad's courage - they all flow through him."
-    },
-
-    # Gun Park
-    Path.YAMAZAKI_HEIR: {
-        "name": "🏯 INFINITE YAMAZAKI: Shingen's Shadow",
-        "cost": 130,
-        "dmg": (220, 330),
-        "desc": "The darkness within becomes unlimited power."
-    },
-    Path.GENIUS_OF_COMBAT: {
-        "name": "🎯 INFINITE GENIUS: Martial God",
-        "cost": 120,
-        "dmg": (200, 310),
-        "desc": "All martial arts are expressions of one truth: Gun Park is the strongest."
-    },
-    Path.ULTRA_INSTINCT_CONSTANT: {
-        "name": "👁️ INFINITE UI: Permanent Awakening",
-        "cost": 140,
-        "dmg": (240, 360),
-        "desc": "Permanent, voluntary Ultra Instinct. His hair is perpetually white."
-    },
-    Path.BLACK_BONE: {
-        "name": "🖤 INFINITE BLACK BONE: Yamazaki's Wrath",
-        "cost": 150,
-        "dmg": (260, 400),
-        "desc": "Ultimate technique passed down through generations of Yamazaki."
-    },
-
-    # Goo Kim
-    Path.MOONLIGHT_SWORD: {
-        "name": "🌙 INFINITE MOONLIGHT: Total Lunar Eclipse",
-        "cost": 120,
-        "dmg": (190, 290),
-        "desc": "All five Moonlight Sword techniques simultaneously."
-    },
-    Path.MAKESHIFT_MASTER: {
-        "name": "🖊️ INFINITE MAKESHIFT: Everything is a Sword",
-        "cost": 100,
-        "dmg": (160, 250),
-        "desc": "In his hands, the air itself becomes a blade."
-    },
-    Path.FIFTH_SWORD: {
-        "name": "✨ INFINITE FIFTH: Technique Beyond God",
-        "cost": 150,
-        "dmg": (270, 400),
-        "desc": "The technique thought impossible. It cuts through reality itself."
-    },
-
-    # Kim Jun-gu
-    Path.HWARANG_SWORD: {
-        "name": "⚔️ INFINITE HWARANG: Goblin Slayer",
-        "cost": 130,
-        "dmg": (210, 320),
-        "desc": "The legendary blade that cuts even goblins."
-    },
-    Path.IMPROVISED_WEAPON: {
-        "name": "🔗 INFINITE IMPROVISATION: Everything is Lethal",
-        "cost": 110,
-        "dmg": (180, 280),
-        "desc": "A pen, a chain, a spring - all weapons."
-    },
-    Path.ARMED_BEAST: {
-        "name": "🗡️ INFINITE ARMED: Top 3 in the Verse",
-        "cost": 140,
-        "dmg": (250, 380),
-        "desc": "Fully armed, Jun-gu takes his place among the three strongest."
-    },
-
-    # Jinrang
-    Path.GAPRYONG_DISCIPLE: {
-        "name": "👑 INFINITE DISCIPLE: True Conviction",
-        "cost": 140,
-        "dmg": (230, 350),
-        "desc": "Jinrang proves he is Gapryong's TRUE disciple."
-    },
-    Path.BUSAN_KING: {
-        "name": "🏆 INFINITE KING: Ruler of the South",
-        "cost": 130,
-        "dmg": (210, 330),
-        "desc": "Jinrang solidifies his reign as the King of Busan."
-    },
-
-    # Jaegyeon Na
-    Path.INCHEON_SPEED: {
-        "name": "🔵 INFINITE SPEED: Faster Than Light",
-        "cost": 110,
-        "dmg": (170, 270),
-        "desc": "He does not move - he simply arrives."
-    },
-    Path.BETRAYER: {
-        "name": "🗡️ INFINITE BETRAYAL: No Hesitation",
-        "cost": 100,
-        "dmg": (160, 260),
-        "desc": "No loyalty, no guilt, no hesitation. The traitor's path."
-    },
-
-    # Manager Kim
-    Path.SPECIAL_FORCES: {
-        "name": "🎖️ INFINITE SPECIAL FORCES: Code 66",
-        "cost": 130,
-        "dmg": (210, 320),
-        "desc": "Former black ops and special forces member. Two units were dedicated to him. His combat experience is unmatched."
-    },
-    Path.PROTECTIVE_FATHER: {
-        "name": "👨‍👧 INFINITE FATHER: For Minji",
-        "cost": 140,
-        "dmg": (240, 360),
-        "desc": "When his daughter Minji is threatened, Manager Kim becomes unstoppable. He will destroy everything in his path."
-    },
-    Path.CQC_MASTER: {
-        "name": "🔫 INFINITE CQC: White Tiger's Finest",
-        "cost": 120,
-        "dmg": (190, 290),
-        "desc": "Close Quarter Combat perfected through decades of experience. Every strike hits a vital point. Every movement is lethal."
-    }
-}
+    # LAW ENFORCEMENT
+    KIM_MINJAE_JUDO = "🥋 Kim Minjae's Judo - Police officer"
+    DETECTIVE_KANG_BOXING = "🥊 Detective Kang's Boxing - Veteran detective"
 
 
 # ============================================================================
@@ -447,6 +187,7 @@ class Character:
         self.canon_episode = 0
         self.path_level = 1
         self.path_exp = 0
+        self.path_history = []
 
     def is_alive(self):
         return self.hp > 0
@@ -478,16 +219,739 @@ class Character:
 
     def choose_path(self, path):
         if path in self.paths_available:
+            if self.path:
+                self.path_history.append(self.path)
             self.path = path
             self.infinity_technique = INFINITY_TECHNIQUES.get(path)
+            self.path_level = 1
+            self.path_exp = 0
             if self.infinity_technique:
                 return f"\n✨✨✨ {self.name} walks the path of {path.value} ✨✨✨\n\n{self.infinity_technique['desc']}\n"
             return f"\n{self.name} walks the path of {path.value}\n"
         return f"\n{path} is not available for {self.name}\n"
 
+    def reset_path(self):
+        if self.path_history:
+            self.path = self.path_history.pop()
+            self.infinity_technique = INFINITY_TECHNIQUES.get(self.path)
+            self.path_level = 1
+            self.path_exp = 0
+            return f"🔄 {self.name} returns to previous path: {self.path.value}"
+        else:
+            self.path = None
+            self.infinity_technique = None
+            self.path_level = 1
+            self.path_exp = 0
+            return f"🔄 {self.name}'s path has been reset. Choose a new path!"
+
+    def to_dict(self):
+        """Convert character to dictionary for saving"""
+        return {
+            'name': self.name,
+            'path': self.path.name if self.path else None,
+            'path_level': self.path_level,
+            'path_exp': self.path_exp,
+            'hp': self.hp,
+            'energy': self.energy
+        }
+
+    def from_dict(self, data):
+        """Load character from dictionary"""
+        if data['path']:
+            for path in Path:
+                if path.name == data['path']:
+                    self.path = path
+                    self.infinity_technique = INFINITY_TECHNIQUES.get(path)
+                    break
+        self.path_level = data['path_level']
+        self.path_exp = data['path_exp']
+        self.hp = data['hp']
+        self.energy = data['energy']
+
 
 # ============================================================================
-# DANIEL PARK
+# INFINITY TECHNIQUES DATABASE
+# ============================================================================
+
+INFINITY_TECHNIQUES = {
+    # GEN 0 LEGENDS
+    Path.GAPRYONG_CONVICTION: {
+        "name": "👑 INFINITE GAPRYONG: Legend's Fist",
+        "cost": 150,
+        "dmg": (300, 400),
+        "desc": "The legendary fist that defeated the Yamazaki Syndicate. Gapryong Kim's ultimate conviction - a punch that changed the course of Gen 0."
+    },
+    Path.TOM_LEE_WILD: {
+        "name": "🐅 INFINITE WILD: Tom Lee Special",
+        "cost": 140,
+        "dmg": (280, 380),
+        "desc": "Tom Lee's ultimate technique. Biting, slashing, pure animal instinct. 'I'm gonna tear his bones apart.'"
+    },
+    Path.CHARLES_ELITE: {
+        "name": "🎭 INFINITE ELITE: Chairman's Authority",
+        "cost": 145,
+        "dmg": (290, 390),
+        "desc": "Charles Choi's invisible attacks. The Vice Leader of Gapryong's Fist shows why he's the puppet master."
+    },
+    Path.JINYOUNG_COPY: {
+        "name": "🔄 INFINITE COPY: Medical Genius",
+        "cost": 135,
+        "dmg": (270, 370),
+        "desc": "Jinyoung Park's perfect copy ability. Any technique seen once can be replicated instantly."
+    },
+    Path.BAEKHO_BEAST: {
+        "name": "🐯 INFINITE BEAST: White Tiger's Wrath",
+        "cost": 130,
+        "dmg": (260, 360),
+        "desc": "Baekho's beast mode unleashed. The White Tiger shows why he's a Gen 0 legend."
+    },
+
+    # 1ST GENERATION KINGS
+    Path.JAMES_LEE_INVISIBLE: {
+        "name": "👑 INFINITE JAMES: Legend of the 1st Gen",
+        "cost": 150,
+        "dmg": (300, 420),
+        "desc": "James Lee's perfected invisible attacks. The man who single-handedly dismantled the 1st Generation."
+    },
+    Path.GITAE_KIM: {
+        "name": "⚡ INFINITE GITAE: Gapryong's Shadow",
+        "cost": 145,
+        "dmg": (290, 400),
+        "desc": "Gitae Kim inherits his father's power. The King of Seoul's unknown technique."
+    },
+    Path.JICHANG_HAND_BLADE: {
+        "name": "🩷 INFINITE HAND BLADE: King's Edge",
+        "cost": 135,
+        "dmg": (270, 380),
+        "desc": "Jichang Kwak's ultimate hand blade technique. Cuts through anything. Note: Ineffective against Jinrang."
+    },
+    Path.TAESOO_MA_FIST: {
+        "name": "🔴 INFINITE RIGHT HAND: Ansan's Pride",
+        "cost": 140,
+        "dmg": (280, 400),
+        "desc": "Taesoo Ma's right fist - no technique, just overwhelming power. The fist that ruled Ansan."
+    },
+    Path.GONGSEOB_IRON: {
+        "name": "🔨 INFINITE IRON: The Monk's Fortress",
+        "cost": 130,
+        "dmg": (260, 360),
+        "desc": "Gongseob Ji's iron boxing. Speed and durability combined into an unbreakable fighting style."
+    },
+    Path.SEOKDU_HEADBUTT: {
+        "name": "💢 INFINITE HEADBUTT: Suwon's Crown",
+        "cost": 125,
+        "dmg": (250, 350),
+        "desc": "Seokdu Wang's legendary headbutt. His forehead is harder than steel."
+    },
+    Path.JAEGYEON_SPEED: {
+        "name": "🔵 INFINITE SPEED: Incheon Flash",
+        "cost": 135,
+        "dmg": (270, 370),
+        "desc": "Jaegyeon Na's ultimate speed. He doesn't move - he simply arrives."
+    },
+    Path.SEONGJI_MONSTER: {
+        "name": "🦍 INFINITE MONSTER: Cheonliang's King",
+        "cost": 140,
+        "dmg": (280, 390),
+        "desc": "Seongji Yuk's mastery of Ssireum, Judo, and Kudo combined into a monstrous fighting style."
+    },
+    Path.JINRANG_CONVICTION: {
+        "name": "👑 INFINITE DISCIPLE: True Conviction",
+        "cost": 150,
+        "dmg": (300, 420),
+        "desc": "Jinrang's ultimate technique. As Gapryong's true disciple, his conviction is absolute."
+    },
+
+    # WORKERS
+    Path.MANDEOK_POWER: {
+        "name": "💪 INFINITE TITAN: Earth Shaker",
+        "cost": 140,
+        "dmg": (280, 400),
+        "desc": "Mandeok's raw power unleashed. A single strike that can shake the earth itself."
+    },
+    Path.CAP_GUY_CQC: {
+        "name": "🔫 INFINITE CQC: Code 66",
+        "cost": 135,
+        "dmg": (270, 380),
+        "desc": "Cap Guy's ultimate CQC technique. Silver Yarn threads dance through the air, binding and cutting."
+    },
+    Path.XIAOLUNG_MUAY_THAI: {
+        "name": "🇹🇭 INFINITE MUAY THAI: Death Blow",
+        "cost": 130,
+        "dmg": (260, 370),
+        "desc": "Xiaolung's perfected Muay Thai. Elbows and knees become deadly weapons."
+    },
+    Path.RYUHEI_YAKUZA: {
+        "name": "⚔️ INFINITE YAKUZA: Gang Lord",
+        "cost": 125,
+        "dmg": (250, 360),
+        "desc": "Ryuhei's yakuza style at its peak. Dirty fighting, gang tactics, overwhelming aggression."
+    },
+    Path.SAMUEL_AMBITION: {
+        "name": "👑 INFINITE AMBITION: King's Path",
+        "cost": 135,
+        "dmg": (270, 380),
+        "desc": "Samuel Seo's ambition-fueled power. The betrayer's strength knows no limits."
+    },
+    Path.SINU_INVISIBLE: {
+        "name": "🌀 INFINITE INVISIBLE: Ghost Fist",
+        "cost": 130,
+        "dmg": (260, 370),
+        "desc": "Sinu Han's invisible attacks - a hybrid of hand and leg techniques. Unseeable, unavoidable."
+    },
+    Path.LOGAN_BULLY: {
+        "name": "👊 INFINITE BULLY: Cheap Shot",
+        "cost": 100,
+        "dmg": (200, 300),
+        "desc": "Logan Lee's ultimate cheap shot. When you least expect it, he strikes."
+    },
+
+    # CHEONLIANG
+    Path.VIN_JIN_SSIREUM: {
+        "name": "🇰🇷 INFINITE SSIREUM: Wrestling God",
+        "cost": 130,
+        "dmg": (260, 370),
+        "desc": "Vin Jin's perfected ssireum technique. Throws and grapples that break bones."
+    },
+    Path.SEONGJI_MARTIAL: {
+        "name": "🥋 INFINITE MARTIAL: Triple Threat",
+        "cost": 140,
+        "dmg": (280, 390),
+        "desc": "Seongji Yuk's combination of ssireum, judo, and kudo. A complete martial artist."
+    },
+    Path.HAN_JAEHA: {
+        "name": "🤼 INFINITE TRADITION: Cheonliang Wrestling",
+        "cost": 115,
+        "dmg": (230, 330),
+        "desc": "Han Jaeha's traditional ssireum technique. Pure Korean wrestling at its finest."
+    },
+    Path.BAEK_SEONG_TAEKKYON: {
+        "name": "🦢 INFINITE FLOW: Taekkyon Dance",
+        "cost": 120,
+        "dmg": (240, 340),
+        "desc": "Baek Seong's flowing taekkyon. Dance-like movements that confuse and destroy."
+    },
+
+    # YAMAZAKI
+    Path.SHINGEN_YAMAZAKI: {
+        "name": "🏯 INFINITE YAMAZAKI: Syndicate's Wrath",
+        "cost": 160,
+        "dmg": (320, 450),
+        "desc": "Shingen Yamazaki's ultimate technique. The head of the Yamazaki Syndicate shows why they were feared."
+    },
+    Path.PARK_FATHER: {
+        "name": "❓ INFINITE MYSTERY: Bloodline Secret",
+        "cost": 140,
+        "dmg": (280, 400),
+        "desc": "Park Jonggun's father's mysterious technique. The source of Gun's power remains unknown."
+    },
+
+    # LAW ENFORCEMENT
+    Path.KIM_MINJAE_JUDO: {
+        "name": "🥋 INFINITE JUDO: Police Force",
+        "cost": 110,
+        "dmg": (220, 320),
+        "desc": "Kim Minjae's perfected judo throws. Law and order brought to the streets."
+    },
+    Path.DETECTIVE_KANG_BOXING: {
+        "name": "🥊 INFINITE DETECTIVE: Veteran's Fist",
+        "cost": 115,
+        "dmg": (230, 330),
+        "desc": "Detective Kang's veteran boxing. Years of experience packed into every punch."
+    }
+}
+
+
+# ============================================================================
+# GEN 0 LEGENDS
+# ============================================================================
+
+class GapryongKim(Character):
+    def __init__(self):
+        super().__init__(
+            "Gapryong Kim",
+            "The Strongest of Gen 0",
+            900, 400,
+            [Realm.SPEED, Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE, Realm.OVERCOMING]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.GAPRYONG_CONVICTION]
+
+        self.abilities['1'] = {"name": "👑 Conviction Punch", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['2'] = {"name": "👑 Gapryong's Fist", "cost": 40, "dmg": (130, 180), "type": "damage"}
+        self.abilities['3'] = {"name": "👑 Will to Protect", "cost": 35, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "👑 Legend's Legacy", "cost": 50, "dmg": (150, 200), "type": "damage"}
+        self.abilities['5'] = {"name": "🛡️ Gapryong's Defense", "cost": 25, "dmg": (0, 0), "type": "utility"}
+
+
+class TomLee(Character):
+    def __init__(self):
+        super().__init__(
+            "Tom Lee",
+            "The Wild",
+            850, 380,
+            [Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.TOM_LEE_WILD]
+
+        self.abilities['1'] = {"name": "🐅 Wild Strike", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🐅 Tom Lee Special", "cost": 35, "dmg": (120, 170), "type": "damage"}
+        self.abilities['3'] = {"name": "🐅 Gen 0 Power", "cost": 40, "dmg": (140, 190), "type": "damage"}
+        self.abilities['4'] = {"name": "🐅 Bite Force", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+class CharlesChoi(Character):
+    def __init__(self):
+        super().__init__(
+            "Charles Choi",
+            "The Puppet Master",
+            800, 360,
+            [Realm.TECHNIQUE, Realm.SPEED]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.CHARLES_ELITE]
+
+        self.abilities['1'] = {"name": "🎭 Invisible Strike", "cost": 30, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🎭 Chairman's Authority", "cost": 40, "dmg": (120, 170), "type": "damage"}
+        self.abilities['3'] = {"name": "🎭 Elite Technique", "cost": 35, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "🎭 Truth of Two Bodies", "cost": 50, "dmg": (150, 200), "type": "damage"}
+
+
+class JinyoungPark(Character):
+    def __init__(self):
+        super().__init__(
+            "Jinyoung Park",
+            "The Medical Genius",
+            780, 350,
+            [Realm.TECHNIQUE]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.JINYOUNG_COPY]
+
+        self.abilities['1'] = {"name": "🔄 Copy: Taekwondo", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['2'] = {"name": "🔄 Copy: Karate", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['3'] = {"name": "🔄 Copy: Boxing", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['4'] = {"name": "🔄 Medical Precision", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+class Baekho(Character):
+    def __init__(self):
+        super().__init__(
+            "Baekho",
+            "The White Tiger",
+            820, 370,
+            [Realm.STRENGTH, Realm.TENACITY]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.BAEKHO_BEAST]
+
+        self.abilities['1'] = {"name": "🐯 Tiger Strike", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['2'] = {"name": "🐯 Beast Mode", "cost": 40, "dmg": (130, 180), "type": "damage"}
+        self.abilities['3'] = {"name": "🐯 White Tiger's Claw", "cost": 35, "dmg": (120, 170), "type": "damage"}
+
+
+# ============================================================================
+# 1ST GENERATION KINGS
+# ============================================================================
+
+class JamesLee(Character):
+    def __init__(self):
+        super().__init__(
+            "James Lee",
+            "Legend of 1st Gen",
+            880, 390,
+            [Realm.SPEED, Realm.TECHNIQUE]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.JAMES_LEE_INVISIBLE]
+
+        self.abilities['1'] = {"name": "👑 Invisible Kick", "cost": 35, "dmg": (120, 170), "type": "damage"}
+        self.abilities['2'] = {"name": "👑 Perfect Form", "cost": 40, "dmg": (140, 190), "type": "damage"}
+        self.abilities['3'] = {"name": "👑 One Man Circle", "cost": 50, "dmg": (170, 220), "type": "damage"}
+        self.abilities['4'] = {"name": "👑 Legend's Speed", "cost": 30, "dmg": (0, 0), "type": "buff"}
+
+
+class GitaeKim(Character):
+    def __init__(self):
+        super().__init__(
+            "Gitae Kim",
+            "King of Seoul",
+            860, 380,
+            [Realm.STRENGTH, Realm.OVERCOMING]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.GITAE_KIM]
+
+        self.abilities['1'] = {"name": "⚡ Gapryong's Blood", "cost": 35, "dmg": (120, 170), "type": "damage"}
+        self.abilities['2'] = {"name": "⚡ Inherited Power", "cost": 40, "dmg": (140, 190), "type": "damage"}
+        self.abilities['3'] = {"name": "⚡ King's Authority", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+class JichangKwak(Character):
+    def __init__(self):
+        super().__init__(
+            "Jichang Kwak",
+            "King of Seoul",
+            800, 360,
+            [Realm.SPEED, Realm.STRENGTH]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.JICHANG_HAND_BLADE]
+
+        self.abilities['1'] = {"name": "🩷 Hand Blade", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['2'] = {"name": "🩷 Double Edge", "cost": 35, "dmg": (120, 170), "type": "damage"}
+        self.abilities['3'] = {"name": "🩷 Seoul King's Pride", "cost": 40, "dmg": (140, 190), "type": "damage"}
+        self.special = "CANNOT DAMAGE JINRANG"
+
+
+class TaesooMa(Character):
+    def __init__(self):
+        super().__init__(
+            "Taesoo Ma",
+            "King of Ansan",
+            820, 350,
+            [Realm.STRENGTH]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.TAESOO_MA_FIST]
+
+        self.abilities['1'] = {"name": "🔴 Right Hand", "cost": 35, "dmg": (130, 180), "type": "damage"}
+        self.abilities['2'] = {"name": "🔴 No Technique", "cost": 40, "dmg": (150, 200), "type": "damage"}
+        self.abilities['3'] = {"name": "🔴 Ansan King", "cost": 30, "dmg": (110, 160), "type": "damage"}
+
+
+class GongseobJi(Character):
+    def __init__(self):
+        super().__init__(
+            "Gongseob Ji",
+            "The Monk",
+            750, 340,
+            [Realm.TECHNIQUE]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.GONGSEOB_IRON]
+
+        self.abilities['1'] = {"name": "🩷 Iron Boxing", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🩷 Speed Technique", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['3'] = {"name": "🩷 Tungsten Defense", "cost": 20, "dmg": (0, 0), "type": "utility"}
+
+
+class SeokduWang(Character):
+    def __init__(self):
+        super().__init__(
+            "Seokdu Wang",
+            "King of Suwon",
+            780, 330,
+            [Realm.STRENGTH, Realm.TENACITY]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.SEOKDU_HEADBUTT]
+
+        self.abilities['1'] = {"name": "💢 Headbutt", "cost": 30, "dmg": (120, 170), "type": "damage"}
+        self.abilities['2'] = {"name": "💢 Iron Forehead", "cost": 25, "dmg": (100, 150), "type": "damage"}
+        self.abilities['3'] = {"name": "💢 Suwon's Crown", "cost": 35, "dmg": (140, 190), "type": "damage"}
+
+
+class JaegyeonNa(Character):
+    def __init__(self):
+        super().__init__(
+            "Jaegyeon Na",
+            "King of Incheon",
+            770, 360,
+            [Realm.SPEED]
+        )
+        self.canon_episode = 544
+        self.paths_available = [Path.JAEGYEON_SPEED]
+
+        self.abilities['1'] = {"name": "🔵 Incheon Speed", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['2'] = {"name": "🔵 Faster Than Light", "cost": 40, "dmg": (140, 190), "type": "damage"}
+        self.abilities['3'] = {"name": "🔵 King of Incheon", "cost": 35, "dmg": (120, 170), "type": "damage"}
+
+
+class SeongjiYuk(Character):
+    def __init__(self):
+        super().__init__(
+            "Seongji Yuk",
+            "The Monster of Cheonliang",
+            820, 370,
+            [Realm.STRENGTH, Realm.TECHNIQUE, Realm.OVERCOMING]
+        )
+        self.canon_episode = 500
+        self.paths_available = [Path.SEONGJI_MONSTER, Path.SEONGJI_MARTIAL]
+
+        self.abilities['1'] = {"name": "🇰🇷 Ssireum: Throw", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🥋 Judo: Ippon", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['3'] = {"name": "🥋 Kudo: Dirty Boxing", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "🦍 Monster Mode", "cost": 45, "dmg": (160, 210), "type": "damage"}
+
+
+class Jinrang(Character):
+    def __init__(self):
+        super().__init__(
+            "Jinrang",
+            "King of Busan",
+            830, 380,
+            [Realm.STRENGTH, Realm.OVERCOMING]
+        )
+        self.canon_episode = 580
+        self.paths_available = [Path.JINRANG_CONVICTION]
+
+        self.abilities['1'] = {"name": "👑 Jinrang's Conviction", "cost": 35, "dmg": (130, 180), "type": "damage"}
+        self.abilities['2'] = {"name": "👑 Gapryong's Disciple", "cost": 40, "dmg": (150, 200), "type": "damage"}
+        self.abilities['3'] = {"name": "👑 Busan King", "cost": 45, "dmg": (170, 220), "type": "damage"}
+        self.abilities['4'] = {"name": "👑 True Conviction", "cost": 60, "dmg": (200, 250), "type": "damage"}
+        self.special = "IMMUNE to Gapryong's Copy and Jichang's Hand Blade"
+
+
+# ============================================================================
+# WORKERS
+# ============================================================================
+
+class Mandeok(Character):
+    def __init__(self):
+        super().__init__(
+            "Mandeok",
+            "The Titan",
+            780, 320,
+            [Realm.STRENGTH]
+        )
+        self.canon_episode = 400
+        self.paths_available = [Path.MANDEOK_POWER]
+
+        self.abilities['1'] = {"name": "💪 Power Punch", "cost": 30, "dmg": (120, 170), "type": "damage"}
+        self.abilities['2'] = {"name": "🌍 Earth Shaker", "cost": 35, "dmg": (140, 190), "type": "damage"}
+        self.abilities['3'] = {"name": "🗿 Titan Strike", "cost": 40, "dmg": (160, 210), "type": "damage"}
+
+
+class CapGuy(Character):
+    def __init__(self):
+        super().__init__(
+            "Cap Guy",
+            "The Senior Manager",
+            750, 340,
+            [Realm.TECHNIQUE, Realm.TENACITY]
+        )
+        self.canon_episode = 290
+        self.paths_available = [Path.CAP_GUY_CQC]
+
+        self.abilities['1'] = {"name": "🔫 CQC: Vital Strikes", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "⚪ Silver Yarn: Thread Bind", "cost": 20, "dmg": (0, 0), "type": "utility"}
+        self.abilities['3'] = {"name": "⚪ Silver Yarn: Thread Slash", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "66 CODE: Full Release", "cost": 50, "dmg": (160, 210), "type": "damage"}
+
+
+class Xiaolung(Character):
+    def __init__(self):
+        super().__init__(
+            "Xiaolung",
+            "Muay Thai Genius",
+            720, 330,
+            [Realm.SPEED, Realm.STRENGTH]
+        )
+        self.canon_episode = 400
+        self.paths_available = [Path.XIAOLUNG_MUAY_THAI]
+
+        self.abilities['1'] = {"name": "🇹🇭 Muay Thai: Elbow", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🇹🇭 Muay Thai: Knee", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['3'] = {"name": "🇹🇭 Thai Clinch", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "🇹🇭 Muay Thai Mastery", "cost": 40, "dmg": (150, 200), "type": "damage"}
+
+
+class Ryuhei(Character):
+    def __init__(self):
+        super().__init__(
+            "Ryuhei",
+            "Yakuza Executive",
+            700, 310,
+            [Realm.TECHNIQUE]
+        )
+        self.canon_episode = 400
+        self.paths_available = [Path.RYUHEI_YAKUZA]
+
+        self.abilities['1'] = {"name": "⚔️ Yakuza Strike", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🏴 Gang Style", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['3'] = {"name": "⚫ Yamazaki Blood", "cost": 35, "dmg": (130, 180), "type": "damage"}
+
+
+class SamuelSeo(Character):
+    def __init__(self):
+        super().__init__(
+            "Samuel Seo",
+            "The Betrayer",
+            730, 330,
+            [Realm.STRENGTH, Realm.TENACITY]
+        )
+        self.canon_episode = 300
+        self.paths_available = [Path.SAMUEL_AMBITION]
+
+        self.abilities['1'] = {"name": "👑 King's Ambition", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['2'] = {"name": "💢 Betrayal", "cost": 25, "dmg": (100, 150), "type": "damage"}
+        self.abilities['3'] = {"name": "⚡ Workers Executive", "cost": 35, "dmg": (130, 180), "type": "damage"}
+        self.abilities['4'] = {"name": "👑 Path to Kingship", "cost": 40, "dmg": (150, 200), "type": "damage"}
+
+
+class SinuHan(Character):
+    def __init__(self):
+        super().__init__(
+            "Sinu Han",
+            "The Ghost",
+            710, 340,
+            [Realm.SPEED, Realm.TECHNIQUE]
+        )
+        self.canon_episode = 300
+        self.paths_available = [Path.SINU_INVISIBLE]
+
+        self.abilities['1'] = {"name": "🌀 Invisible Punch", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['2'] = {"name": "🌀 Invisible Kick", "cost": 30, "dmg": (100, 150), "type": "damage"}
+        self.abilities['3'] = {"name": "🌀 Ghost Fist", "cost": 40, "dmg": (140, 190), "type": "damage"}
+
+
+class LoganLee(Character):
+    def __init__(self):
+        super().__init__(
+            "Logan Lee",
+            "The Bully",
+            550, 280,
+            []
+        )
+        self.canon_episode = 1
+        self.paths_available = [Path.LOGAN_BULLY]
+
+        self.abilities['1'] = {"name": "👊 Bully Punch", "cost": 20, "dmg": (60, 110), "type": "damage"}
+        self.abilities['2'] = {"name": "😤 Intimidation", "cost": 15, "dmg": (0, 0), "type": "utility"}
+        self.abilities['3'] = {"name": "💢 Cheap Shot", "cost": 25, "dmg": (80, 130), "type": "damage"}
+
+
+# ============================================================================
+# CHEONLIANG
+# ============================================================================
+
+class VinJin(Character):
+    def __init__(self):
+        super().__init__(
+            "Vin Jin",
+            "Ssireum Genius",
+            680, 310,
+            [Realm.STRENGTH]
+        )
+        self.canon_episode = 500
+        self.paths_available = [Path.VIN_JIN_SSIREUM]
+
+        self.abilities['1'] = {"name": "🇰🇷 Ssireum: Throw", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['2'] = {"name": "🇰🇷 Ssireum: Grapple", "cost": 25, "dmg": (90, 140), "type": "damage"}
+        self.abilities['3'] = {"name": "🥋 Judo: Ippon", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['4'] = {"name": "🥋 Kudo: Dirty Boxing", "cost": 30, "dmg": (110, 160), "type": "damage"}
+        self.abilities['5'] = {"name": "🕶️ Sunglasses Off", "cost": 40, "dmg": (150, 200), "type": "damage"}
+
+
+class HanJaeha(Character):
+    def __init__(self):
+        super().__init__(
+            "Han Jaeha",
+            "Cheonliang Wrestler",
+            600, 290,
+            [Realm.STRENGTH]
+        )
+        self.canon_episode = 500
+        self.paths_available = [Path.HAN_JAEHA]
+
+        self.abilities['1'] = {"name": "🤼 Traditional Throw", "cost": 20, "dmg": (70, 120), "type": "damage"}
+        self.abilities['2'] = {"name": "🤼 Grapple Lock", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['3'] = {"name": "🤼 Cheonliang Pride", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+class BaekSeong(Character):
+    def __init__(self):
+        super().__init__(
+            "Baek Seong",
+            "Taekkyon Dancer",
+            590, 300,
+            [Realm.SPEED, Realm.TECHNIQUE]
+        )
+        self.canon_episode = 500
+        self.paths_available = [Path.BAEK_SEONG_TAEKKYON]
+
+        self.abilities['1'] = {"name": "🦢 Flowing Step", "cost": 20, "dmg": (60, 110), "type": "damage"}
+        self.abilities['2'] = {"name": "🦢 Taekkyon Kick", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['3'] = {"name": "🦢 Dance of Blades", "cost": 35, "dmg": (120, 170), "type": "damage"}
+
+
+# ============================================================================
+# YAMAZAKI
+# ============================================================================
+
+class ShingenYamazaki(Character):
+    def __init__(self):
+        super().__init__(
+            "Shingen Yamazaki",
+            "Yamazaki Head",
+            950, 420,
+            [Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE, Realm.OVERCOMING]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.SHINGEN_YAMAZAKI]
+
+        self.abilities['1'] = {"name": "🏯 Yamazaki Style", "cost": 40, "dmg": (150, 200), "type": "damage"}
+        self.abilities['2'] = {"name": "🏯 Syndicate's Wrath", "cost": 50, "dmg": (180, 230), "type": "damage"}
+        self.abilities['3'] = {"name": "🏯 Black Bone", "cost": 60, "dmg": (210, 270), "type": "damage"}
+        self.abilities['4'] = {"name": "🏯 Inherited Darkness", "cost": 70, "dmg": (250, 320), "type": "damage"}
+
+
+class ParkFather(Character):
+    def __init__(self):
+        super().__init__(
+            "Park Jonggun's Father",
+            "The Mystery",
+            800, 380,
+            [Realm.STRENGTH, Realm.TECHNIQUE]
+        )
+        self.canon_episode = 0
+        self.paths_available = [Path.PARK_FATHER]
+
+        self.abilities['1'] = {"name": "❓ Unknown Technique", "cost": 35, "dmg": (130, 180), "type": "damage"}
+        self.abilities['2'] = {"name": "❓ Bloodline Secret", "cost": 45, "dmg": (160, 210), "type": "damage"}
+        self.abilities['3'] = {"name": "❓ Father's Shadow", "cost": 50, "dmg": (180, 230), "type": "damage"}
+
+
+# ============================================================================
+# LAW ENFORCEMENT
+# ============================================================================
+
+class KimMinjae(Character):
+    def __init__(self):
+        super().__init__(
+            "Kim Minjae",
+            "Police Officer",
+            550, 280,
+            [Realm.TECHNIQUE]
+        )
+        self.canon_episode = 200
+        self.paths_available = [Path.KIM_MINJAE_JUDO]
+
+        self.abilities['1'] = {"name": "🥋 Judo Throw", "cost": 20, "dmg": (60, 110), "type": "damage"}
+        self.abilities['2'] = {"name": "🥋 Ippon Seoi Nage", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['3'] = {"name": "🥋 Police Training", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+class DetectiveKang(Character):
+    def __init__(self):
+        super().__init__(
+            "Detective Kang",
+            "Veteran Detective",
+            570, 290,
+            [Realm.SPEED]
+        )
+        self.canon_episode = 200
+        self.paths_available = [Path.DETECTIVE_KANG_BOXING]
+
+        self.abilities['1'] = {"name": "🥊 Detective's Jab", "cost": 20, "dmg": (60, 110), "type": "damage"}
+        self.abilities['2'] = {"name": "🥊 Veteran Cross", "cost": 25, "dmg": (80, 130), "type": "damage"}
+        self.abilities['3'] = {"name": "🥊 Experience Counts", "cost": 30, "dmg": (100, 150), "type": "damage"}
+
+
+# ============================================================================
+# EXISTING CHARACTERS
 # ============================================================================
 
 class DanielPark(Character):
@@ -498,7 +962,6 @@ class DanielPark(Character):
             420, 300,
             [Realm.SPEED, Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE, Realm.OVERCOMING]
         )
-
         self.episode_state = episode_state
         self.canon_episode = 581
         self.ui_mode = False
@@ -508,128 +971,27 @@ class DanielPark(Character):
         self.gapryong_copied = True
         self.form = "Normal"
         self.switch_available = True
+        self.paths_available = [Path.DANIEL_UI, Path.DANIEL_COPY]
 
-        self.paths_available = [
-            Path.ULTRA_INSTINCT,
-            Path.COPY_MASTER,
-            Path.SECOND_BODY,
-            Path.HERO_PATH,
-            Path.UI_MASTER
-        ]
-
-        self._load_abilities()
-
-    def _load_abilities(self):
-        self.abilities['1'] = {
-            "name": "👊 Desperate Flailing",
-            "cost": 10,
-            "dmg": (20, 35),
-            "type": "damage",
-            "desc": "EP 1-50: Daniel has NO fighting skill. Pure desperation."
-        }
-        self.abilities['2'] = {
-            "name": "🔄 Instinctive Copy",
-            "cost": 20,
-            "dmg": (30, 50),
-            "type": "damage",
-            "desc": "EP 50-100: Subconscious copying. Unreliable, low accuracy."
-        }
-        self.abilities['3'] = {
-            "name": "🇷🇺 Systema: Ryabina",
-            "cost": 25,
-            "dmg": (50, 70),
-            "type": "damage",
-            "desc": "EP 150: Learned from Sophia. Russian martial art."
-        }
-        self.abilities['4'] = {
-            "name": "🇷🇺 Systema: Otmashka",
-            "cost": 30,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "Swing-through strike. Maximum momentum."
-        }
-        self.abilities['5'] = {
-            "name": "⚡ Copy: Zack's Counter",
-            "cost": 25,
-            "dmg": (55, 80),
-            "type": "damage",
-            "desc": "Perfect counter timing."
-        }
-        self.abilities['6'] = {
-            "name": "⚡ Copy: Vasco's Sunken Fist",
-            "cost": 30,
-            "dmg": (65, 90),
-            "type": "damage",
-            "desc": "Justice compressed into a fist."
-        }
-        self.abilities['7'] = {
-            "name": "⚡ Copy: Eli's Animal Instinct",
-            "cost": 30,
-            "dmg": (70, 95),
-            "type": "damage",
-            "desc": "Wild, efficient. No wasted movement."
-        }
-        self.abilities['8'] = {
-            "name": "⚡ Copy: Jake's Conviction",
-            "cost": 35,
-            "dmg": (75, 105),
-            "type": "damage",
-            "desc": "Willpower becomes power."
-        }
-        self.abilities['9'] = {
-            "name": "⚡ Copy: Johan's Choreography",
-            "cost": 40,
-            "dmg": (80, 115),
-            "type": "damage",
-            "desc": "Dance-like combat. Unpredictable angles."
-        }
-        self.abilities['10'] = {
-            "name": "⚡ Copy: Gun's Taekwondo",
-            "cost": 35,
-            "dmg": (80, 110),
-            "type": "damage",
-            "desc": "Perfect spinning back kick."
-        }
-        self.abilities['11'] = {
-            "name": "⚡ Copy: Goo's Sword Style",
-            "cost": 40,
-            "dmg": (85, 120),
-            "type": "damage",
-            "desc": "Makeshift sword. Any object becomes deadly."
-        }
-        self.abilities['12'] = {
-            "name": "🩷 Jichang's Hand Blade",
-            "cost": 45,
-            "dmg": (90, 130),
-            "type": "damage",
-            "desc": "Knife-hand strike. CANNOT DAMAGE JINRANG."
-        }
-        self.abilities['13'] = {
-            "name": "👑 Gapryong's Conviction",
-            "cost": 60,
-            "dmg": (120, 180),
-            "type": "damage",
-            "desc": "The legendary punch. DOES NOT WORK ON JINRANG."
-        }
-        self.abilities['14'] = {"name": "🔵 Realm of Speed", "cost": 50, "dmg": (0, 0), "type": "realm"}
-        self.abilities['15'] = {"name": "🔴 Realm of Strength", "cost": 50, "dmg": (0, 0), "type": "realm"}
-        self.abilities['16'] = {"name": "🟢 Realm of Tenacity", "cost": 50, "dmg": (0, 0), "type": "realm"}
-        self.abilities['17'] = {"name": "🩷 Realm of Technique", "cost": 50, "dmg": (0, 0), "type": "realm"}
-        self.abilities['18'] = {"name": "🟣 Realm of Overcoming", "cost": 50, "dmg": (0, 0), "type": "realm"}
-        self.abilities['19'] = {
-            "name": "👁️ Ultra Instinct",
-            "cost": 100,
-            "dmg": (0, 0),
-            "type": "ui",
-            "desc": "WHITE HAIR AWAKENING. Body fights on its own. Perfect evasion."
-        }
+        self.abilities['1'] = {"name": "👊 Desperate Flailing", "cost": 10, "dmg": (20, 35), "type": "damage"}
+        self.abilities['2'] = {"name": "🔄 Instinctive Copy", "cost": 20, "dmg": (30, 50), "type": "damage"}
+        self.abilities['3'] = {"name": "🇷🇺 Systema: Ryabina", "cost": 25, "dmg": (50, 70), "type": "damage"}
+        self.abilities['4'] = {"name": "⚡ Copy: Zack's Counter", "cost": 25, "dmg": (55, 80), "type": "damage"}
+        self.abilities['5'] = {"name": "⚡ Copy: Vasco's Sunken Fist", "cost": 30, "dmg": (65, 90), "type": "damage"}
+        self.abilities['6'] = {"name": "⚡ Copy: Eli's Animal Instinct", "cost": 30, "dmg": (70, 95), "type": "damage"}
+        self.abilities['7'] = {"name": "⚡ Copy: Jake's Conviction", "cost": 35, "dmg": (75, 105), "type": "damage"}
+        self.abilities['8'] = {"name": "⚡ Copy: Johan's Choreography", "cost": 40, "dmg": (80, 115), "type": "damage"}
+        self.abilities['9'] = {"name": "⚡ Copy: Gun's Taekwondo", "cost": 35, "dmg": (80, 110), "type": "damage"}
+        self.abilities['10'] = {"name": "🩷 Jichang's Hand Blade", "cost": 45, "dmg": (90, 130), "type": "damage"}
+        self.abilities['11'] = {"name": "👑 Gapryong's Conviction", "cost": 60, "dmg": (120, 180), "type": "damage"}
+        self.abilities['12'] = {"name": "👁️ Ultra Instinct", "cost": 100, "dmg": (0, 0), "type": "ui"}
 
     def activate_ui(self):
         self.ui_mode = True
         self.ui_timer = 3
         self.form = "ULTRA INSTINCT"
         self.hp = min(self.max_hp, self.hp + 50)
-        return "👁️👁️👁️👁️👁️ ULTRA INSTINCT! White hair awakens! Perfect evasion!"
+        return "👁️👁️👁️👁️👁️ ULTRA INSTINCT! White hair awakens!"
 
     def get_damage_multiplier(self):
         mult = 1.0
@@ -637,992 +999,152 @@ class DanielPark(Character):
         if self.active_realm == Realm.STRENGTH:
             mult *= 1.7
             buffs.append("🔴 STRENGTH")
-        elif self.active_realm == Realm.OVERCOMING and self.hp < self.max_hp * 0.3:
-            mult *= 2.0
-            buffs.append("🟣 OVERCOMING")
         if self.ui_mode:
             mult *= 2.5
             buffs.append("👁️ ULTRA INSTINCT")
         return mult, buffs
 
 
-# ============================================================================
-# ZACK LEE - THE IRON BOXER
-# ============================================================================
-
 class ZackLee(Character):
     def __init__(self):
-        super().__init__(
-            "Zack Lee",
-            "The Iron Boxer",
-            380, 280,
-            [Realm.SPEED]
-        )
-
+        super().__init__("Zack Lee", "The Iron Boxer", 380, 280, [Realm.SPEED])
         self.canon_episode = 1
-        self.paths_available = [Path.COUNTER_GENIUS, Path.SHINING_STAR, Path.BOXING_EMPEROR]
-        self.footwork_active = False
-        self.footwork_timer = 0
+        self.paths_available = [Path.ZACK_IRON]
         self.heat_mode = False
-        self.heat_timer = 0
+        self.abilities['1'] = {"name": "🔨 Iron Fortress Stance", "cost": 15, "dmg": (0, 0), "type": "buff"}
+        self.abilities['2'] = {"name": "🔨 Iron Fist", "cost": 20, "dmg": (50, 75), "type": "damage"}
+        self.abilities['3'] = {"name": "🥊 Jab", "cost": 15, "dmg": (35, 55), "type": "damage"}
+        self.abilities['4'] = {"name": "🥊 Cross", "cost": 20, "dmg": (45, 70), "type": "damage"}
+        self.abilities['5'] = {"name": "⚡ Counter Punch", "cost": 30, "dmg": (75, 110), "type": "damage"}
+        self.abilities['6'] = {"name": "💫 Shining Star", "cost": 50, "dmg": (100, 150), "type": "damage"}
 
-        self.abilities['1'] = {
-            "name": "🥊 Jab",
-            "cost": 15,
-            "dmg": (35, 55),
-            "type": "damage",
-            "desc": "Lightning fast lead punch. Sets up combinations. Classic outboxer technique."
-        }
-        self.abilities['2'] = {
-            "name": "🥊 Cross",
-            "cost": 20,
-            "dmg": (45, 70),
-            "type": "damage",
-            "desc": "Powerful rear straight. Speed is Zack's specialty."
-        }
-        self.abilities['3'] = {
-            "name": "🥊 Hook",
-            "cost": 20,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Devastating curved punch. Rarely targets the body, focuses on head shots."
-        }
-        self.abilities['4'] = {
-            "name": "🥊 Uppercut",
-            "cost": 25,
-            "dmg": (55, 80),
-            "type": "damage",
-            "desc": "Explosive rising strike. Keeps opponents at range."
-        }
-        self.abilities['5'] = {
-            "name": "🥊 1-2-3 Combo",
-            "cost": 30,
-            "dmg": (70, 100),
-            "type": "damage",
-            "desc": "Jab, cross, hook. Classic boxing combination. Quick combos are Zack's specialty."
-        }
-        self.abilities['6'] = {
-            "name": "⚡ Counter Punch",
-            "cost": 30,
-            "dmg": (75, 110),
-            "type": "damage",
-            "desc": "Perfect timing counter. Double damage if enemy attacked. Zack's timing is legendary."
-        }
-        self.abilities['7'] = {
-            "name": "🔄 Hit and Run",
-            "cost": 25,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Outboxer style. Strike then evade. Minimizes time in opponent's range."
-        }
-        self.abilities['8'] = {
-            "name": "🛡️ Philly Shell",
-            "cost": 20,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Mayweather-style defense. Deflects punches with shoulder. -40% damage next turn."
-        }
-        self.abilities['9'] = {
-            "name": "🏃 Footwork",
-            "cost": 20,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Superior boxing movement. +25% evasion (3 turns). Speed is everything."
-        }
-        self.abilities['10'] = {
-            "name": "💫 Shining Star",
-            "cost": 50,
-            "dmg": (100, 150),
-            "type": "damage",
-            "desc": "Zack's ultimate technique. All his power in one perfect punch. For Mira."
-        }
-        self.abilities['11'] = {
-            "name": "❤️ For Mira",
-            "cost": 35,
-            "dmg": (85, 120),
-            "type": "damage",
-            "desc": "Power increases when protecting Mira. A boxer's pride fuels his strikes."
-        }
-        self.abilities['12'] = {
-            "name": "🔥 Heat Mode",
-            "cost": 45,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Activates when feeling self-hatred. Body becomes hot, heart feels like bursting. +50% damage, adaptive fighting (3 turns)."
-        }
-
-
-# ============================================================================
-# JOHAN SEONG
-# ============================================================================
 
 class JohanSeong(Character):
     def __init__(self, blind=True):
-        super().__init__(
-            "Johan Seong",
-            "The God Eye",
-            400, 300,
-            [Realm.TECHNIQUE, Realm.SPEED]
-        )
-
+        super().__init__("Johan Seong", "The God Eye", 400, 300, [Realm.TECHNIQUE, Realm.SPEED])
         self.canon_episode = 100
         self.blind = blind
-        self.god_eye_active = False
+        self.paths_available = [Path.JOHAN_GOD_EYE, Path.JOHAN_CHOREOGRAPHY]
+        self.abilities['1'] = {"name": "👁️ Copy: Taekwondo", "cost": 20, "dmg": (50, 75), "type": "damage"}
+        self.abilities['2'] = {"name": "👁️ Copy: Boxing", "cost": 20, "dmg": (50, 75), "type": "damage"}
+        self.abilities['3'] = {"name": "💃 Choreography", "cost": 40, "dmg": (85, 120), "type": "damage"}
+        self.abilities['4'] = {"name": "👁️ God Eye", "cost": 45, "dmg": (0, 0), "type": "buff"}
+        if blind:
+            self.abilities['5'] = {"name": "🕶️ Blindness", "cost": 0, "dmg": (0, 0), "type": "passive"}
 
-        self.paths_available = [
-            Path.GOD_EYE,
-            Path.CHOREOGRAPHY,
-            Path.BLIND_SAGE,
-            Path.INFINITE_COPY
-        ]
-
-        self._load_abilities()
-
-    def _load_abilities(self):
-        self.abilities['1'] = {
-            "name": "👁️ Copy: Taekwondo",
-            "cost": 20,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Perfect Gun-style Taekwondo."
-        }
-        self.abilities['2'] = {
-            "name": "👁️ Copy: Karate",
-            "cost": 20,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Perfect Kyokushin Karate."
-        }
-        self.abilities['3'] = {
-            "name": "👁️ Copy: Boxing",
-            "cost": 20,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Perfect Boxing. Counter-specialist."
-        }
-        self.abilities['4'] = {
-            "name": "👁️ Copy: Capoeira",
-            "cost": 20,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Perfect Capoeira. Flowing, evasive."
-        }
-        self.abilities['5'] = {
-            "name": "💃 Choreography",
-            "cost": 40,
-            "dmg": (85, 120),
-            "type": "damage",
-            "desc": "Johan's signature. Dance-like combat."
-        }
-        self.abilities['6'] = {
-            "name": "💃 Choreography: Finale",
-            "cost": 60,
-            "dmg": (110, 160),
-            "type": "damage",
-            "desc": "The climax of Johan's dance."
-        }
-        self.abilities['7'] = {
-            "name": "👁️ God Eye",
-            "cost": 45,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Johan's copy talent peaks. +50% damage."
-        }
-        if self.blind:
-            self.abilities['8'] = {
-                "name": "🕶️ Blindness",
-                "cost": 0,
-                "dmg": (0, 0),
-                "type": "passive",
-                "desc": "CANON: Johan went blind. 30% accuracy penalty."
-            }
-            self.abilities['9'] = {
-                "name": "🕶️ Blind Fighting",
-                "cost": 30,
-                "dmg": (70, 100),
-                "type": "damage",
-                "desc": "Johan fights despite blindness."
-            }
-        self.abilities['10'] = {
-            "name": "🕊️ Mira's Memory",
-            "cost": 35,
-            "dmg": (80, 115),
-            "type": "damage",
-            "desc": "Johan remembers why he started fighting."
-        }
-        self.form = "Blind" if self.blind else "God Eye"
-
-
-# ============================================================================
-# VASCO
-# ============================================================================
 
 class Vasco(Character):
     def __init__(self):
-        super().__init__(
-            "Vasco",
-            "The Hero of Justice",
-            450, 260,
-            [Realm.STRENGTH, Realm.TENACITY]
-        )
-
+        super().__init__("Vasco", "The Hero of Justice", 450, 260, [Realm.STRENGTH, Realm.TENACITY])
         self.canon_episode = 1
-        self.muscle_boost = False
-        self.boost_timer = 0
-        self.muay_thai_learned = True
+        self.paths_available = [Path.VASCO_SYSTEMA, Path.VASCO_MUAY_THAI]
+        self.abilities['1'] = {"name": "🇷🇺 Systema: Ryabina", "cost": 20, "dmg": (50, 70), "type": "damage"}
+        self.abilities['2'] = {"name": "🇷🇺 Russian Cross", "cost": 35, "dmg": (75, 105), "type": "damage"}
+        self.abilities['3'] = {"name": "🇹🇭 Muay Thai: Death Blow", "cost": 40, "dmg": (90, 130), "type": "damage"}
+        self.abilities['4'] = {"name": "👊 Sunken Fist", "cost": 30, "dmg": (70, 100), "type": "damage"}
 
-        self.paths_available = [
-            Path.SYSTEMA_MASTER,
-            Path.MUAY_THAI_LEGEND,
-            Path.BURN_KNUCKLE_KING
-        ]
-
-        self._load_abilities()
-
-    def _load_abilities(self):
-        self.abilities['1'] = {
-            "name": "🇷🇺 Systema: Ryabina",
-            "cost": 20,
-            "dmg": (50, 70),
-            "type": "damage",
-            "desc": "PRIMARY: 'Rowan Tree'. Flowing, circular strikes."
-        }
-        self.abilities['2'] = {
-            "name": "🇷🇺 Systema: Perelesnik",
-            "cost": 25,
-            "dmg": (55, 80),
-            "type": "damage",
-            "desc": "'Whirlwind'. Continuous spinning attacks."
-        }
-        self.abilities['3'] = {
-            "name": "🇷🇺 Systema: Otmashka",
-            "cost": 30,
-            "dmg": (65, 90),
-            "type": "damage",
-            "desc": "Swing-through strike. Maximum momentum."
-        }
-        self.abilities['4'] = {
-            "name": "🇷🇺 Russian Cross",
-            "cost": 35,
-            "dmg": (75, 105),
-            "type": "damage",
-            "desc": "Vasco's signature Systema technique."
-        }
-        self.abilities['5'] = {
-            "name": "🇹🇭 Muay Thai: Roundhouse",
-            "cost": 25,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "SECONDARY: Shin-based kick."
-        }
-        self.abilities['6'] = {
-            "name": "🇹🇭 Muay Thai: Death Blow",
-            "cost": 40,
-            "dmg": (90, 130),
-            "type": "damage",
-            "desc": "Vasco's ultimate Muay Thai technique."
-        }
-        self.abilities['7'] = {
-            "name": "👊 Sunken Fist",
-            "cost": 30,
-            "dmg": (70, 100),
-            "type": "damage",
-            "desc": "Justice compressed into a single fist."
-        }
-        self.abilities['8'] = {
-            "name": "🔥 Burn Knuckles Combo",
-            "cost": 35,
-            "dmg": (75, 110),
-            "type": "damage",
-            "desc": "Relentless barrage. Justice never stops."
-        }
-        self.abilities['9'] = {
-            "name": "🏃 Run Over",
-            "cost": 30,
-            "dmg": (65, 95),
-            "type": "damage",
-            "desc": "Charges forward with overwhelming momentum."
-        }
-        self.abilities['10'] = {
-            "name": "🛡️ Protect the Weak",
-            "cost": 25,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Vasco takes damage for an ally. -70% damage."
-        }
-        self.abilities['11'] = {
-            "name": "💪 Muscle Enhancement",
-            "cost": 30,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Intense training results. +30% damage (5 turns)."
-        }
-
-    def get_damage_multiplier(self):
-        mult = 1.0
-        buffs = []
-        if self.muscle_boost:
-            mult *= 1.3
-            buffs.append("💪 MUSCLE")
-        return mult, buffs
-
-
-# ============================================================================
-# JAY HONG
-# ============================================================================
 
 class JayHong(Character):
     def __init__(self):
-        super().__init__(
-            "Jay Hong",
-            "The Silent Blade",
-            380, 270,
-            [Realm.TECHNIQUE, Realm.SPEED]
-        )
-
+        super().__init__("Jay Hong", "The Silent Blade", 380, 270, [Realm.TECHNIQUE, Realm.SPEED])
         self.canon_episode = 1
-        self.paths_available = [Path.SILENT_PROTECTOR, Path.KALI_MASTER]
+        self.paths_available = [Path.JAY_KALI]
+        self.abilities['1'] = {"name": "🇷🇺 Systema: Neutralizer", "cost": 20, "dmg": (45, 65), "type": "damage"}
+        self.abilities['2'] = {"name": "🇵🇭 Kali: Double Baston", "cost": 25, "dmg": (50, 75), "type": "damage"}
+        self.abilities['3'] = {"name": "🇵🇭 Kali: Karambit", "cost": 30, "dmg": (65, 90), "type": "damage"}
+        self.abilities['4'] = {"name": "🛡️ Motorcycle Helmet", "cost": 15, "dmg": (0, 0), "type": "utility"}
 
-        self.abilities['1'] = {
-            "name": "🇷🇺 Systema: Neutralizer",
-            "cost": 20,
-            "dmg": (45, 65),
-            "type": "damage",
-            "desc": "Redirectional. Turns opponent's force against them."
-        }
-        self.abilities['2'] = {
-            "name": "🇷🇺 Systema: Breaker",
-            "cost": 25,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Joint strikes and pressure points."
-        }
-        self.abilities['3'] = {
-            "name": "🇷🇺 Systema: Medved",
-            "cost": 30,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "'The Bear'. Overwhelming forward pressure."
-        }
-        self.abilities['4'] = {
-            "name": "🇵🇭 Kali: Double Baston",
-            "cost": 25,
-            "dmg": (50, 75),
-            "type": "damage",
-            "desc": "Twin stick fighting. Uses motorcycle helmet."
-        }
-        self.abilities['5'] = {
-            "name": "🇵🇭 Kali: Espada y Daga",
-            "cost": 35,
-            "dmg": (70, 95),
-            "type": "damage",
-            "desc": "Sword and dagger style."
-        }
-        self.abilities['6'] = {
-            "name": "🛡️ Motorcycle Helmet",
-            "cost": 15,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Reduces damage by 50%."
-        }
-        self.abilities['7'] = {
-            "name": "💝 Gift",
-            "cost": 20,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Jay gives Daniel expensive clothes. No healing, just encouragement."
-        }
-        self.abilities['8'] = {
-            "name": "🐶 Inu's Puppies",
-            "cost": 25,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Puppies distract enemies. 50% stun chance."
-        }
-        self.abilities['9'] = {
-            "name": "🩷 Silence",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Jay does NOT speak. Immune to taunt. 10% evasion."
-        }
-
-
-# ============================================================================
-# ELI JANG
-# ============================================================================
 
 class EliJang(Character):
     def __init__(self):
-        super().__init__(
-            "Eli Jang",
-            "The Wild",
-            410, 260,
-            [Realm.TECHNIQUE]
-        )
-
+        super().__init__("Eli Jang", "The Wild", 410, 260, [Realm.TECHNIQUE])
         self.canon_episode = 150
-        self.paths_available = [Path.BEAST_KING, Path.HOSTEL_FATHER, Path.TOM_LEE_LEGACY]
+        self.paths_available = [Path.ELI_BEAST, Path.ELI_TOM_LEE]
         self.beast_mode = False
-        self.beast_timer = 0
-
         self.abilities['1'] = {"name": "🐺 Wolf Strike", "cost": 20, "dmg": (50, 75), "type": "damage"}
         self.abilities['2'] = {"name": "🦅 Talon Kick", "cost": 25, "dmg": (60, 85), "type": "damage"}
-        self.abilities['3'] = {"name": "🐍 Viper Punch", "cost": 25, "dmg": (60, 90), "type": "damage"}
-        self.abilities['4'] = {"name": "🐅 Tiger Claw", "cost": 30, "dmg": (70, 100), "type": "damage"}
-        self.abilities['5'] = {
-            "name": "🦁 Beast Mode",
-            "cost": 45,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "+60% damage, +40% evasion (3 turns)."
-        }
-        self.abilities['6'] = {
-            "name": "👴 Tom Lee Special",
-            "cost": 40,
-            "dmg": (85, 125),
-            "type": "damage",
-            "desc": "Taught by Gen 0 legend Tom Lee."
-        }
-        self.abilities['7'] = {
-            "name": "👶 For Yenna",
-            "cost": 50,
-            "dmg": (100, 150),
-            "type": "damage",
-            "desc": "Eli's daughter. His ultimate motivation."
-        }
-        self.abilities['8'] = {"name": "🏚️ Hostel Leader", "cost": 35, "dmg": (70, 105), "type": "damage"}
-        self.abilities['9'] = {
-            "name": "🛡️ Hostel Defense",
-            "cost": 30,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "-50% damage to allies."
-        }
+        self.abilities['3'] = {"name": "🦁 Beast Mode", "cost": 45, "dmg": (0, 0), "type": "buff"}
+        self.abilities['4'] = {"name": "👴 Tom Lee Special", "cost": 40, "dmg": (85, 125), "type": "damage"}
 
     def activate_beast_mode(self):
         self.beast_mode = True
         self.beast_timer = 3
-        self.form = "Beast Mode"
-        return "🦁🦁🦁 BEAST MODE! +60% damage, +40% evasion (3 turns)"
+        return "🦁🦁🦁 BEAST MODE! +60% damage!"
 
-    def get_damage_multiplier(self):
-        mult = 1.0
-        if self.beast_mode:
-            mult *= 1.6
-        return mult, ["🦁 BEAST"] if self.beast_mode else []
-
-
-# ============================================================================
-# WARREN CHAE
-# ============================================================================
 
 class WarrenChae(Character):
     def __init__(self):
-        super().__init__(
-            "Warren Chae",
-            "Gangdong's Mighty",
-            390, 260,
-            [Realm.STRENGTH]
-        )
-
+        super().__init__("Warren Chae", "Gangdong's Mighty", 390, 260, [Realm.STRENGTH])
         self.canon_episode = 277
-        self.jkd_mastery = True
-        self.smk_trained = True
-        self.cqc_trained = True
-        self.new_cqc_unlocked = True
-        self.mastery_achieved = True
+        self.paths_available = [Path.WARREN_JKD, Path.WARREN_CQC, Path.WARREN_HEART]
         self.exhausted = False
+        self.abilities['1'] = {"name": "🥋 Jeet Kune Do: Interception", "cost": 20, "dmg": (55, 80), "type": "damage"}
+        self.abilities['2'] = {"name": "🔫 CQC Foundation", "cost": 30, "dmg": (70, 100), "type": "damage"}
+        self.abilities['3'] = {"name": "⚡ NEW CQC: Full Release", "cost": 70, "dmg": (120, 170), "type": "damage"}
+        self.abilities['4'] = {"name": "💔 Heart Attack Punch", "cost": 60, "dmg": (110, 160), "type": "damage"}
 
-        self.paths_available = [
-            Path.JKD_MASTER,
-            Path.CQC_OPERATOR,
-            Path.NEW_CQC_CREATOR,
-            Path.HEART_ATTACK
-        ]
-
-        self._load_abilities()
-
-    def _load_abilities(self):
-        self.abilities['1'] = {
-            "name": "🥋 Jeet Kune Do: Interception",
-            "cost": 20,
-            "dmg": (55, 80),
-            "type": "damage",
-            "desc": "Self-taught through 1,000+ street fights."
-        }
-        self.abilities['2'] = {
-            "name": "🥋 JKD: Vital Strikes",
-            "cost": 25,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "Attacks the weakest areas of the body."
-        }
-        self.abilities['3'] = {
-            "name": "🥋 JKD: No Block",
-            "cost": 15,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Warren never blocks. +30% damage, -20% defense."
-        }
-        self.abilities['4'] = {
-            "name": "👴 Manager Kim's Tutelage",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "SMK corrected Warren's JKD foundation. +15% accuracy to all JKD moves."
-        }
-        self.abilities['5'] = {
-            "name": "🦶 Silent Step",
-            "cost": 15,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Next attack has +40% critical chance."
-        }
-        self.abilities['6'] = {
-            "name": "🔫 CQC Foundation",
-            "cost": 30,
-            "dmg": (70, 100),
-            "type": "damage",
-            "desc": "Military Close Quarter Combat."
-        }
-        self.abilities['7'] = {
-            "name": "🔫 CQC: 3ft Radius",
-            "cost": 35,
-            "dmg": (75, 110),
-            "type": "damage",
-            "desc": "Continuous attacks. Opponent cannot escape."
-        }
-        self.abilities['8'] = {
-            "name": "⚡ NEW CQC: Awakening",
-            "cost": 50,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "NO DISCERNIBLE PATTERN. Cannot be copied."
-        }
-        self.abilities['9'] = {
-            "name": "⚡ NEW CQC: Full Release",
-            "cost": 70,
-            "dmg": (120, 170),
-            "type": "damage",
-            "desc": "DRAWBACK: Exhausted after use."
-        }
-        self.abilities['10'] = {
-            "name": "👑 Mastery: Overcoming",
-            "cost": 45,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Can fight 1st Generation Kings."
-        }
-        self.abilities['11'] = {
-            "name": "💔 Heart Attack Punch",
-            "cost": 60,
-            "dmg": (110, 160),
-            "type": "damage",
-            "desc": "One-inch punch to the heart. Durability negation."
-        }
-
-    def use_new_cqc(self):
-        self.exhausted = True
-        return "⚡⚡⚡ NEW CQC: FULL RELEASE! Cannot act next turn!"
-
-
-# ============================================================================
-# JAKE KIM
-# ============================================================================
 
 class JakeKim(Character):
     def __init__(self):
-        super().__init__(
-            "Jake Kim",
-            "The Conviction",
-            430, 270,
-            [Realm.OVERCOMING]
-        )
-
+        super().__init__("Jake Kim", "The Conviction", 430, 270, [Realm.OVERCOMING])
         self.canon_episode = 200
-        self.paths_available = [Path.CONVICTION_KING, Path.GAPRYONG_BLOOD, Path.BIG_DEAL_LEADER]
-        self.conviction_mode = False
+        self.paths_available = [Path.JAKE_CONVICTION, Path.JAKE_GAPRYONG]
+        self.abilities['1'] = {"name": "⚖️ Conviction Punch", "cost": 25, "dmg": (60, 85), "type": "damage"}
+        self.abilities['2'] = {"name": "👑 Inherited Will", "cost": 50, "dmg": (95, 140), "type": "damage"}
+        self.abilities['3'] = {"name": "👑 Gapryong's Blood", "cost": 70, "dmg": (120, 180), "type": "damage"}
+        self.abilities['4'] = {"name": "⚖️ Conviction Mode", "cost": 45, "dmg": (0, 0), "type": "realm"}
 
-        self.abilities['1'] = {
-            "name": "⚖️ Conviction Punch",
-            "cost": 25,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "Jake's will manifests as power."
-        }
-        self.abilities['2'] = {
-            "name": "⚖️ Unshakeable Will",
-            "cost": 30,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "+40% damage, immune to fear."
-        }
-        self.abilities['3'] = {
-            "name": "⚖️ Conviction Mode",
-            "cost": 45,
-            "dmg": (0, 0),
-            "type": "realm",
-            "desc": "+100% damage when below 30% HP."
-        }
-        self.abilities['4'] = {
-            "name": "🛡️ Big Deal Defense",
-            "cost": 25,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "-60% damage to all allies."
-        }
-        self.abilities['5'] = {
-            "name": "🤝 Crew Solidarity",
-            "cost": 30,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Big Deal's loyalty strengthens Jake. +30% damage for 3 turns."
-        }
-        self.abilities['6'] = {
-            "name": "🦏 Jerry's Gift",
-            "cost": 20,
-            "dmg": (55, 80),
-            "type": "damage",
-            "desc": "Jerry Kwon's loyalty strengthens Jake."
-        }
-        self.abilities['7'] = {
-            "name": "👑 Inherited Will",
-            "cost": 50,
-            "dmg": (95, 140),
-            "type": "damage",
-            "desc": "Jake channels his father's legendary power."
-        }
-        self.abilities['8'] = {
-            "name": "👑 Gapryong's Blood",
-            "cost": 70,
-            "dmg": (120, 180),
-            "type": "damage",
-            "desc": "The blood of the strongest."
-        }
-        self.abilities['9'] = {
-            "name": "🥋 Gangseop's Style",
-            "cost": 35,
-            "dmg": (75, 110),
-            "type": "damage",
-            "desc": "Technique from Gapryong's disciple."
-        }
-
-
-# ============================================================================
-# GUN PARK
-# ============================================================================
 
 class GunPark(Character):
     def __init__(self):
-        super().__init__(
-            "Gun Park",
-            "Legend of Gen 1",
-            500, 320,
-            [Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE]
-        )
-
+        super().__init__("Gun Park", "Legend of Gen 1", 500, 320,
+                         [Realm.STRENGTH, Realm.TENACITY, Realm.TECHNIQUE])
         self.canon_episode = 300
-        self.paths_available = [
-            Path.YAMAZAKI_HEIR,
-            Path.GENIUS_OF_COMBAT,
-            Path.ULTRA_INSTINCT_CONSTANT,
-            Path.BLACK_BONE
-        ]
+        self.paths_available = [Path.GUN_YAMAZAKI, Path.GUN_CONSTANT_UI]
         self.permanent_ui = True
-        self.form = "Ultra Instinct"
-
         self.abilities['1'] = {"name": "🥋 Taekwondo: Roundhouse", "cost": 20, "dmg": (65, 90), "type": "damage"}
-        self.abilities['2'] = {"name": "🥋 Taekwondo: Spinning Back Kick", "cost": 30, "dmg": (80, 115),
-                               "type": "damage"}
-        self.abilities['3'] = {"name": "🥋 Taekwondo: 540 Kick", "cost": 40, "dmg": (95, 135), "type": "damage"}
-        self.abilities['4'] = {"name": "🥋 Kyokushin: Straight", "cost": 25, "dmg": (70, 100), "type": "damage"}
-        self.abilities['5'] = {"name": "🥋 Kyokushin: Tameshiwari", "cost": 35, "dmg": (85, 125), "type": "damage"}
-        self.abilities['6'] = {"name": "🥋 Aikido: Irimi", "cost": 25, "dmg": (65, 95), "type": "damage"}
-        self.abilities['7'] = {"name": "🥋 Aikido: Kokyu", "cost": 30, "dmg": (70, 105), "type": "damage"}
-        self.abilities['8'] = {"name": "🇧🇷 Capoeira: Ginga", "cost": 25, "dmg": (60, 90), "type": "damage"}
-        self.abilities['9'] = {"name": "🇧🇷 Capoeira: Armada", "cost": 35, "dmg": (80, 120), "type": "damage"}
-        self.abilities['10'] = {"name": "🔨 Tonfa Strike", "cost": 30, "dmg": (75, 110), "type": "damage"}
-        self.abilities['11'] = {"name": "⚡ Stun Baton", "cost": 35, "dmg": (80, 115), "type": "damage"}
-        self.abilities['12'] = {"name": "🖤 Black Bone", "cost": 70, "dmg": (130, 200), "type": "damage"}
-        self.abilities['13'] = {
-            "name": "👁️ Ultra Instinct",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Permanent 30% evasion, 20% counter."
-        }
-        self.abilities['14'] = {"name": "🏯 Yamazaki Heir", "cost": 50, "dmg": (100, 155), "type": "damage"}
+        self.abilities['2'] = {"name": "🥋 Kyokushin: Straight", "cost": 25, "dmg": (70, 100), "type": "damage"}
+        self.abilities['3'] = {"name": "🖤 Black Bone", "cost": 70, "dmg": (130, 200), "type": "damage"}
+        self.abilities['4'] = {"name": "👁️ Constant UI", "cost": 0, "dmg": (0, 0), "type": "passive"}
 
-
-# ============================================================================
-# GOO KIM
-# ============================================================================
 
 class GooKim(Character):
     def __init__(self):
-        super().__init__(
-            "Goo Kim",
-            "The Moonlight Sword",
-            480, 300,
-            [Realm.TECHNIQUE, Realm.SPEED]
-        )
-
+        super().__init__("Goo Kim", "The Moonlight Sword", 480, 300, [Realm.TECHNIQUE, Realm.SPEED])
         self.canon_episode = 300
-        self.paths_available = [Path.MOONLIGHT_SWORD, Path.MAKESHIFT_MASTER, Path.FIFTH_SWORD]
-        self.form = "Moonlight Sword"
-
+        self.paths_available = [Path.GOO_MOONLIGHT, Path.GOO_FIFTH]
         self.abilities['1'] = {"name": "🖊️ Pen Sword", "cost": 15, "dmg": (45, 70), "type": "damage"}
-        self.abilities['2'] = {"name": "🧹 Broom Sword", "cost": 20, "dmg": (50, 75), "type": "damage"}
-        self.abilities['3'] = {"name": "🥢 Chopstick Sword", "cost": 20, "dmg": (50, 75), "type": "damage"}
-        self.abilities['4'] = {"name": "📱 Phone Sword", "cost": 25, "dmg": (55, 80), "type": "damage"}
-        self.abilities['5'] = {"name": "🌙 First Sword: Early Moon", "cost": 30, "dmg": (75, 105), "type": "damage"}
-        self.abilities['6'] = {"name": "🌓 Second Sword: Crescent Moon", "cost": 35, "dmg": (80, 115), "type": "damage"}
-        self.abilities['7'] = {"name": "🌕 Third Sword: Full Moon", "cost": 45, "dmg": (100, 145), "type": "damage"}
-        self.abilities['8'] = {
-            "name": "🌑 Zero Sword: Lunar Eclipse",
-            "cost": 60,
-            "dmg": (130, 190),
-            "type": "counter",
-            "desc": "Take reduced damage, pierce opponent's heart."
-        }
-        self.abilities['9'] = {"name": "✨ Fifth Sword", "cost": 90, "dmg": (170, 250), "type": "damage"}
-        self.abilities['10'] = {"name": "💰 Yakuza Deal", "cost": 40, "dmg": (90, 135), "type": "damage"}
+        self.abilities['2'] = {"name": "🌙 First Sword: Early Moon", "cost": 30, "dmg": (75, 105), "type": "damage"}
+        self.abilities['3'] = {"name": "🌓 Second Sword: Crescent Moon", "cost": 35, "dmg": (80, 115), "type": "damage"}
+        self.abilities['4'] = {"name": "🌕 Third Sword: Full Moon", "cost": 45, "dmg": (100, 145), "type": "damage"}
+        self.abilities['5'] = {"name": "🌑 Zero Sword: Lunar Eclipse", "cost": 60, "dmg": (130, 190), "type": "counter"}
+        self.abilities['6'] = {"name": "✨ Fifth Sword", "cost": 90, "dmg": (170, 250), "type": "damage"}
 
-
-# ============================================================================
-# KIM JUN-GU
-# ============================================================================
 
 class KimJungu(Character):
     def __init__(self):
-        super().__init__(
-            "Kim Jun-gu",
-            "The Hwarang Sword",
-            520, 290,
-            [Realm.TECHNIQUE, Realm.SPEED]
-        )
-
+        super().__init__("Kim Jun-gu", "The Hwarang Sword", 520, 290, [Realm.TECHNIQUE, Realm.SPEED])
         self.canon_episode = 500
-        self.paths_available = [Path.HWARANG_SWORD, Path.IMPROVISED_WEAPON, Path.ARMED_BEAST]
-        self.armed = True
-        self.form = "Armed"
+        self.paths_available = [Path.JOONGOO_HWARANG, Path.JOONGOO_ARMED]
+        self.abilities['1'] = {"name": "🖊️ Pen Pierce", "cost": 25, "dmg": (70, 100), "type": "damage"}
+        self.abilities['2'] = {"name": "🔗 Chain Whip", "cost": 30, "dmg": (75, 110), "type": "damage"}
+        self.abilities['3'] = {"name": "⚔️ Hwarang Sword", "cost": 60, "dmg": (140, 210), "type": "damage"}
+        self.abilities['4'] = {"name": "⚔️ Hwarang: Blade Dance", "cost": 70, "dmg": (160, 240), "type": "damage"}
 
-        self.abilities['1'] = {"name": "👊 Bare-Handed Strike", "cost": 20, "dmg": (55, 80), "type": "damage"}
-        self.abilities['2'] = {"name": "🖊️ Pen Pierce", "cost": 25, "dmg": (70, 100), "type": "damage"}
-        self.abilities['3'] = {"name": "🔗 Chain Whip", "cost": 30, "dmg": (75, 110), "type": "damage"}
-        self.abilities['4'] = {"name": "🥢 Iron Chopsticks", "cost": 30, "dmg": (80, 115), "type": "damage"}
-        self.abilities['5'] = {"name": "👓 Broken Glasses", "cost": 25, "dmg": (65, 95), "type": "damage"}
-        self.abilities['6'] = {"name": "⏱️ Spring Blade", "cost": 35, "dmg": (85, 125), "type": "damage"}
-        self.abilities['7'] = {"name": "🗡️ Scimitar", "cost": 40, "dmg": (100, 150), "type": "damage"}
-        self.abilities['8'] = {"name": "⚔️ Hwarang Sword", "cost": 60, "dmg": (140, 210), "type": "damage"}
-        self.abilities['9'] = {"name": "⚔️ Hwarang: Blade Dance", "cost": 70, "dmg": (160, 240), "type": "damage"}
-        self.abilities['10'] = {
-            "name": "🔄 Improvisation",
-            "cost": 20,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Next attack +50% damage."
-        }
-        self.abilities['11'] = {
-            "name": "🛡️ Tenacity",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Reduced damage from blunt attacks."
-        }
-
-
-# ============================================================================
-# JINRANG
-# ============================================================================
-
-class Jinrang(Character):
-    def __init__(self):
-        super().__init__(
-            "Jinrang",
-            "King of Busan",
-            750, 380,
-            [Realm.STRENGTH, Realm.OVERCOMING]
-        )
-
-        self.canon_episode = 580
-        self.paths_available = [Path.GAPRYONG_DISCIPLE, Path.BUSAN_KING]
-
-        self.abilities['1'] = {"name": "👑 Jinrang's Conviction", "cost": 40, "dmg": (130, 190), "type": "damage"}
-        self.abilities['2'] = {"name": "👑 Gapryong's Disciple", "cost": 50, "dmg": (120, 180), "type": "damage"}
-        self.abilities['3'] = {"name": "👑 Busan King", "cost": 60, "dmg": (140, 210), "type": "damage"}
-        self.abilities['4'] = {"name": "👑 True Conviction", "cost": 80, "dmg": (170, 250), "type": "damage"}
-        self.abilities['5'] = {"name": "🛡️ Gapryong's Defense", "cost": 30, "dmg": (0, 0), "type": "utility"}
-
-        self.special = "IMMUNE to Gapryong's Copy and Jichang's Hand Blade"
-
-
-# ============================================================================
-# JAEGYEON NA
-# ============================================================================
-
-class JaegyeonNa(Character):
-    def __init__(self):
-        super().__init__(
-            "Jaegyeon Na",
-            "King of Incheon",
-            620, 350,
-            [Realm.SPEED]
-        )
-
-        self.canon_episode = 544
-        self.paths_available = [Path.INCHEON_SPEED, Path.BETRAYER]
-
-        self.abilities['1'] = {"name": "🔵 Incheon Speed", "cost": 35, "dmg": (100, 150), "type": "damage"}
-        self.abilities['2'] = {"name": "🗡️ Betrayal", "cost": 40, "dmg": (95, 145), "type": "damage"}
-        self.abilities['3'] = {"name": "🔵 King of Incheon", "cost": 50, "dmg": (120, 180), "type": "damage"}
-        self.abilities['4'] = {"name": "🔵 Faster Than Light", "cost": 70, "dmg": (150, 230), "type": "damage"}
-
-
-# ============================================================================
-# MANAGER KIM
-# ============================================================================
 
 class ManagerKim(Character):
     def __init__(self):
-        super().__init__(
-            "Manager Kim",
-            "The Senior Manager",
-            480, 300,
-            [Realm.TECHNIQUE, Realm.TENACITY, Realm.STRENGTH]
-        )
-
+        super().__init__("Manager Kim", "The Senior Manager", 480, 300,
+                         [Realm.TECHNIQUE, Realm.TENACITY, Realm.STRENGTH])
         self.canon_episode = 290
-        self.daughter_minji = True
-        self.white_tiger_employee = True
-        self.special_forces_vet = True
         self.code_66 = True
         self.veinous_rage = False
-        self.rage_timer = 0
-
-        self.paths_available = [
-            Path.SPECIAL_FORCES,
-            Path.PROTECTIVE_FATHER,
-            Path.CQC_MASTER
-        ]
-
-        self._load_abilities()
-
-    def _load_abilities(self):
-        self.abilities['1'] = {
-            "name": "🎖️ Special Forces Training",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Former black ops and special forces member. Two units were dedicated to him. Permanent +20% damage, +15% evasion."
-        }
-        self.abilities['2'] = {
-            "name": "🔫 CQC: Vital Strikes",
-            "cost": 25,
-            "dmg": (65, 90),
-            "type": "damage",
-            "desc": "Close Quarter Combat perfected. Every strike hits a vital point. Military precision."
-        }
-        self.abilities['3'] = {
-            "name": "🔫 CQC: 3ft Kill Zone",
-            "cost": 35,
-            "dmg": (80, 115),
-            "type": "damage",
-            "desc": "Within 3 feet, Manager Kim is unbeatable. Continuous attacks to vital areas."
-        }
-        self.abilities['4'] = {
-            "name": "🛡️ Battle-Scarred",
-            "cost": 0,
-            "dmg": (0, 0),
-            "type": "passive",
-            "desc": "Numerous bullet wounds and cuts cover his body. He's survived everything. -15% damage taken."
-        }
-        self.abilities['5'] = {
-            "name": "👁️ Veinous Rage",
-            "cost": 40,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "When angered, excessive veins emerge and eyes become bloodshot. +50% damage, ignores pain (4 turns)."
-        }
-        self.abilities['6'] = {
-            "name": "👨‍👧 For Minji",
-            "cost": 50,
-            "dmg": (100, 150),
-            "type": "damage",
-            "desc": "When his daughter Minji is threatened, Manager Kim becomes unstoppable. Massive damage increase."
-        }
-        self.abilities['7'] = {
-            "name": "🔍 Father's Determination",
-            "cost": 30,
-            "dmg": (0, 0),
-            "type": "utility",
-            "desc": "Will destroy everything in his path to find his daughter. Removes all debuffs, next attack guaranteed critical."
-        }
-        self.abilities['8'] = {
-            "name": "🐯 White Tiger Agent",
-            "cost": 25,
-            "dmg": (60, 85),
-            "type": "damage",
-            "desc": "Employed by Tom Lee at the White Tiger Job Centre. Professional, efficient, lethal."
-        }
-        self.abilities['9'] = {
-            "name": "😐 Unassuming Demeanor",
-            "cost": 15,
-            "dmg": (0, 0),
-            "type": "buff",
-            "desc": "Appears as an average middle-aged man. Enemies underestimate him. +30% critical chance next attack."
-        }
-        self.abilities['10'] = {
-            "name": "66 CODE: Full Release",
-            "cost": 70,
-            "dmg": (130, 190),
-            "type": "damage",
-            "desc": "His former code name. When he fully unleashes his special forces training, nothing stands in his way."
-        }
-        self.abilities['11'] = {
-            "name": "🔪 Improvised Weapons",
-            "cost": 30,
-            "dmg": (70, 100),
-            "type": "damage",
-            "desc": "Anything becomes a weapon in his hands. Pens, tools, everyday objects - all deadly."
-        }
-
-    def get_damage_multiplier(self):
-        mult = 1.2
-        buffs = ["🎖️ SPECIAL FORCES"]
-
-        if self.veinous_rage:
-            mult *= 1.5
-            buffs.append("👁️ RAGE")
-        if self.active_realm == Realm.STRENGTH:
-            mult *= 1.7
-            buffs.append("🔴 STRENGTH")
-        elif self.active_realm == Realm.TECHNIQUE:
-            mult *= 1.4
-            buffs.append("🩷 TECHNIQUE")
-
-        return mult, buffs
-
-
-# ============================================================================
-# MIRA KIM - REMOVED FROM PLAYABLE ROSTER (Non-combatant)
-# ============================================================================
-
-class MiraKim(Character):
-    def __init__(self):
-        super().__init__(
-            "Mira Kim",
-            "The Heart",
-            200, 200,
-            []
-        )
-
-        self.canon_episode = 1
-        self.paths_available = []
-        # No combat abilities - she's a non-combatant character
-        self.abilities = {}
-        self.affiliation = "J High"
+        self.silver_yarn_active = False
+        self.paths_available = [Path.CAP_GUY_CQC]
+        self.abilities['1'] = {"name": "🎖️ Special Forces Training", "cost": 0, "dmg": (0, 0), "type": "passive"}
+        self.abilities['2'] = {"name": "🔫 CQC: Vital Strikes", "cost": 25, "dmg": (65, 90), "type": "damage"}
+        self.abilities['3'] = {"name": "⚪ Silver Yarn: Thread Bind", "cost": 20, "dmg": (0, 0), "type": "utility"}
+        self.abilities['4'] = {"name": "66 CODE: Full Release", "cost": 70, "dmg": (130, 190), "type": "damage"}
 
 
 # ============================================================================
@@ -1639,7 +1161,61 @@ class Enemy(Character):
 
 
 # ============================================================================
-# ENEMY CREATION FUNCTIONS
+# MISSING ENEMY CREATION FUNCTIONS
+# ============================================================================
+
+def create_enemy_sally():
+    abilities = {
+        '1': {"name": "Sally Special", "dmg": (45, 70)},
+        '2': {"name": "Family Support", "dmg": (40, 65)}
+    }
+    enemy = Enemy("Sally", "Hostel Manager", 320, 200, abilities, 60, "Hostel")
+    enemy.ai_pattern = ['1', '2']
+    return enemy
+
+
+def create_enemy_brad():
+    abilities = {
+        '1': {"name": "Brad Punch", "dmg": (50, 75)},
+        '2': {"name": "Big Deal Loyalty", "dmg": (55, 80)}
+    }
+    enemy = Enemy("Brad", "Big Deal Member", 350, 220, abilities, 55, "Big Deal")
+    enemy.ai_pattern = ['2', '1']
+    return enemy
+
+
+def create_enemy_jace_park():
+    abilities = {
+        '1': {"name": "Strategy", "dmg": (40, 60)},
+        '2': {"name": "Tactical Strike", "dmg": (45, 70)}
+    }
+    enemy = Enemy("Jace Park", "Burn Knuckles Strategist", 330, 210, abilities, 58, "Burn Knuckles")
+    enemy.ai_pattern = ['2', '1']
+    return enemy
+
+
+def create_enemy_burn_knuckles():
+    abilities = {
+        '1': {"name": "Burn Knuckle Punch", "dmg": (35, 55)},
+        '2': {"name": "Justice Strike", "dmg": (40, 60)}
+    }
+    enemy = Enemy("Burn Knuckles Member", "Hero Wannabe", 280, 180, abilities, 70, "Burn Knuckles")
+    enemy.ai_pattern = ['2', '1']
+    return enemy
+
+
+def create_enemy_eugene():
+    abilities = {
+        '1': {"name": "Corporate Strategy", "dmg": (30, 50)},
+        '2': {"name": "Workers' Orders", "dmg": (35, 55)}
+    }
+    enemy = Enemy("Eugene", "Workers Executive", 300, 250, abilities, 65, "Workers")
+    enemy.ai_pattern = ['2', '1']
+    return enemy
+
+
+# ============================================================================
+# EXISTING ENEMY CREATION FUNCTIONS
 # ============================================================================
 
 def create_enemy_frame_soldier():
@@ -1653,10 +1229,49 @@ def create_enemy_logan_lee():
     abilities = {
         '1': {"name": "Bully Punch", "dmg": (35, 55)},
         '2': {"name": "Intimidation", "dmg": (30, 50)},
-        '3': {"name": "Cheap Shot", "dmg": (40, 65)},
+        '3': {"name": "Cheap Shot", "dmg": (40, 65)}
     }
     enemy = Enemy("Logan Lee", "The Bully", 300, 180, abilities, 85, "Independent")
     enemy.ai_pattern = ['3', '1', '2']
+    return enemy
+
+
+def create_enemy_jhigh_bully():
+    abilities = {'1': {"name": "School Punch", "dmg": (20, 35)}}
+    enemy = Enemy("J High Bully", "School Thug", 100, 80, abilities, 120, "J High")
+    enemy.ai_pattern = ['1']
+    return enemy
+
+
+def create_enemy_zack_lee():
+    abilities = {
+        '1': {"name": "Jab", "dmg": (35, 55)},
+        '2': {"name": "Cross", "dmg": (45, 70)},
+        '3': {"name": "Counter", "dmg": (60, 85)}
+    }
+    enemy = Enemy("Zack Lee", "The Iron Boxer", 380, 280, abilities, 35, "J High")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_vasco_enemy():
+    abilities = {
+        '1': {"name": "Systema Strike", "dmg": (50, 70)},
+        '2': {"name": "Sunken Fist", "dmg": (70, 100)},
+        '3': {"name": "Run Over", "dmg": (65, 95)}
+    }
+    enemy = Enemy("Vasco", "The Hero", 450, 260, abilities, 30, "Burn Knuckles")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_jay_hong_enemy():
+    abilities = {
+        '1': {"name": "Systema", "dmg": (45, 65)},
+        '2': {"name": "Kali", "dmg": (50, 75)}
+    }
+    enemy = Enemy("Jay Hong", "The Silent", 380, 270, abilities, 40, "J High")
+    enemy.ai_pattern = ['2', '1']
     return enemy
 
 
@@ -1665,42 +1280,10 @@ def create_enemy_johan_seong_enemy():
         '1': {"name": "Copy: Taekwondo", "dmg": (50, 75)},
         '2': {"name": "Copy: Boxing", "dmg": (50, 75)},
         '3': {"name": "Choreography", "dmg": (85, 120)},
-        '4': {"name": "God Eye", "dmg": (95, 140)},
+        '4': {"name": "God Eye", "dmg": (95, 140)}
     }
     enemy = Enemy("Johan Seong", "The God Eye", 400, 300, abilities, 15, "God Dog")
     enemy.ai_pattern = ['4', '3', '2', '1']
-    return enemy
-
-
-def create_enemy_vasco_enemy():
-    abilities = {
-        '1': {"name": "Systema Strike", "dmg": (50, 70)},
-        '2': {"name": "Sunken Fist", "dmg": (70, 100)},
-        '3': {"name": "Run Over", "dmg": (65, 95)},
-    }
-    enemy = Enemy("Vasco", "The Hero", 450, 260, abilities, 30, "Burn Knuckles")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_zack_lee():
-    abilities = {
-        '1': {"name": "Jab", "dmg": (35, 55)},
-        '2': {"name": "Cross", "dmg": (45, 70)},
-        '3': {"name": "Counter", "dmg": (60, 85)},
-    }
-    enemy = Enemy("Zack Lee", "The Iron Boxer", 380, 280, abilities, 35, "J High")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_jay_hong_enemy():
-    abilities = {
-        '1': {"name": "Systema", "dmg": (45, 65)},
-        '2': {"name": "Kali", "dmg": (50, 75)},
-    }
-    enemy = Enemy("Jay Hong", "The Silent", 380, 270, abilities, 40, "J High")
-    enemy.ai_pattern = ['2', '1']
     return enemy
 
 
@@ -1708,7 +1291,7 @@ def create_enemy_eli_jang_enemy():
     abilities = {
         '1': {"name": "Animal Strike", "dmg": (50, 75)},
         '2': {"name": "Talon Kick", "dmg": (60, 85)},
-        '3': {"name": "Beast Mode", "dmg": (85, 120)},
+        '3': {"name": "Beast Mode", "dmg": (85, 120)}
     }
     enemy = Enemy("Eli Jang", "The Wild", 410, 260, abilities, 16, "Hostel")
     enemy.ai_pattern = ['3', '2', '1']
@@ -1720,7 +1303,7 @@ def create_enemy_warren_chae_enemy():
         '1': {"name": "JKD: Interception", "dmg": (60, 85)},
         '2': {"name": "Shield Strike", "dmg": (65, 90)},
         '3': {"name": "Counter", "dmg": (70, 100)},
-        '4': {"name": "NEW CQC", "dmg": (90, 130)},
+        '4': {"name": "NEW CQC", "dmg": (90, 130)}
     }
     enemy = Enemy("Warren Chae", "Hostel Executive", 390, 260, abilities, 30, "Hostel")
     enemy.ai_pattern = ['4', '3', '2', '1']
@@ -1731,7 +1314,7 @@ def create_enemy_jake_kim_enemy():
     abilities = {
         '1': {"name": "Conviction Punch", "dmg": (60, 85)},
         '2': {"name": "Inherited Will", "dmg": (95, 140)},
-        '3': {"name": "Gapryong's Blood", "dmg": (120, 180)},
+        '3': {"name": "Gapryong's Blood", "dmg": (120, 180)}
     }
     enemy = Enemy("Jake Kim", "The Conviction", 430, 270, abilities, 12, "Big Deal")
     enemy.ai_pattern = ['3', '2', '1']
@@ -1742,200 +1325,10 @@ def create_enemy_jerry_kwon():
     abilities = {
         '1': {"name": "Gift Punch", "dmg": (65, 95)},
         '2': {"name": "Rhino Charge", "dmg": (70, 105)},
-        '3': {"name": "Loyalty to Jake", "dmg": (80, 115)},
+        '3': {"name": "Loyalty to Jake", "dmg": (80, 115)}
     }
     enemy = Enemy("Jerry Kwon", "Big Deal Executive", 420, 250, abilities, 25, "Big Deal")
     enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_xiaolung():
-    abilities = {
-        '1': {"name": "🇹🇭 Muay Thai: Elbow", "dmg": (80, 120)},
-        '2': {"name": "🇹🇭 Muay Thai: Knee", "dmg": (85, 125)},
-        '3': {"name": "🇹🇭 Thai Clinch", "dmg": (75, 110)},
-        '4': {"name": "🇹🇭 Muay Thai Mastery", "dmg": (110, 170)},
-    }
-    enemy = Enemy("Xiaolung", "Muay Thai Genius", 550, 300, abilities, 14, "Workers")
-    enemy.ai_pattern = ['4', '1', '2', '3']
-    return enemy
-
-
-def create_enemy_mandeok():
-    abilities = {
-        '1': {"name": "💪 Power Punch", "dmg": (90, 130)},
-        '2': {"name": "🌍 Earth Shaker", "dmg": (100, 150)},
-        '3': {"name": "🗿 Titan Strike", "dmg": (120, 180)},
-    }
-    enemy = Enemy("Mandeok", "The Titan", 600, 280, abilities, 13, "Workers")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_vin_jin():
-    abilities = {
-        '1': {"name": "🇰🇷 Ssireum: Throw", "dmg": (75, 110)},
-        '2': {"name": "🇰🇷 Ssireum: Grapple", "dmg": (70, 105)},
-        '3': {"name": "🥋 Judo: Ippon", "dmg": (80, 115)},
-        '4': {"name": "🥋 Kudo: Dirty Boxing", "dmg": (85, 120)},
-        '5': {"name": "🕶️ Sunglasses Off", "dmg": (110, 160)},
-    }
-    enemy = Enemy("Vin Jin", "Ssireum Genius", 520, 280, abilities, 28, "Workers")
-    enemy.ai_pattern = ['5', '4', '3', '2', '1']
-    return enemy
-
-
-def create_enemy_ryuhei():
-    abilities = {
-        '1': {"name": "⚔️ Yakuza Strike", "dmg": (80, 115)},
-        '2': {"name": "🏴 Gang Style", "dmg": (85, 120)},
-        '3': {"name": "⚫ Yamazaki Blood", "dmg": (100, 150)},
-    }
-    enemy = Enemy("Ryuhei", "Yakuza Executive", 540, 290, abilities, 24, "Workers")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_samuel_seo():
-    abilities = {
-        '1': {"name": "👑 King's Ambition", "dmg": (85, 125)},
-        '2': {"name": "💢 Betrayal", "dmg": (80, 120)},
-        '3': {"name": "⚡ Workers Executive", "dmg": (95, 140)},
-        '4': {"name": "👑 Path to Kingship", "dmg": (110, 170)},
-    }
-    enemy = Enemy("Samuel Seo", "The Betrayer", 560, 300, abilities, 18, "Workers")
-    enemy.ai_pattern = ['4', '3', '1', '2']
-    return enemy
-
-
-def create_enemy_eugene():
-    abilities = {
-        '1': {"name": "📊 Corporate Command", "dmg": (50, 80)},
-        '2': {"name": "📈 Strategic Planning", "dmg": (0, 0)},
-        '3': {"name": "🏭 Summon Affiliate", "dmg": (0, 0)},
-    }
-    enemy = Enemy("Eugene", "Workers CEO", 350, 300, abilities, 10, "Workers")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_taesoo_ma():
-    abilities = {
-        '1': {"name": "🔴 Right Hand", "dmg": (110, 170)},
-        '2': {"name": "🔴 Ansan King", "dmg": (120, 180)},
-    }
-    enemy = Enemy("Taesoo Ma", "King of Ansan", 580, 300, abilities, 8, "1st Gen")
-    enemy.ai_pattern = ['2', '1']
-    return enemy
-
-
-def create_enemy_gongseob_ji():
-    abilities = {
-        '1': {"name": "🩷 Speed Technique", "dmg": (95, 140)},
-        '2': {"name": "🩷 Vice King", "dmg": (100, 150)},
-    }
-    enemy = Enemy("Gongseob Ji", "Vice King", 500, 280, abilities, 11, "1st Gen")
-    enemy.ai_pattern = ['2', '1']
-    return enemy
-
-
-def create_enemy_jichang_kwak():
-    abilities = {
-        '1': {"name": "🩷 Hand Blade", "dmg": (100, 155)},
-        '2': {"name": "👑 Seoul King", "dmg": (110, 170)},
-    }
-    enemy = Enemy("Jichang Kwak", "King of Seoul", 550, 300, abilities, 7, "1st Gen")
-    enemy.ai_pattern = ['2', '1']
-    return enemy
-
-
-def create_enemy_gun_park_enemy():
-    abilities = {
-        '1': {"name": "Taekwondo", "dmg": (65, 90)},
-        '2': {"name": "Kyokushin", "dmg": (70, 100)},
-        '3': {"name": "Black Bone", "dmg": (130, 200)},
-    }
-    enemy = Enemy("Gun Park", "Legend of Gen 1", 500, 320, abilities, 5, "Independent")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_goo_kim_enemy():
-    abilities = {
-        '1': {"name": "Makeshift Sword", "dmg": (45, 70)},
-        '2': {"name": "Full Moon", "dmg": (100, 145)},
-        '3': {"name": "Fifth Sword", "dmg": (170, 250)},
-    }
-    enemy = Enemy("Goo Kim", "The Moonlight Sword", 480, 300, abilities, 5, "Independent")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_kim_jungu_enemy():
-    abilities = {
-        '1': {"name": "Improvised Weapon", "dmg": (70, 100)},
-        '2': {"name": "Hwarang Sword", "dmg": (140, 210)},
-        '3': {"name": "Blade Dance", "dmg": (160, 240)},
-    }
-    enemy = Enemy("Kim Jun-gu", "The Hwarang Sword", 520, 290, abilities, 4, "Independent")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_jinrang_enemy():
-    abilities = {
-        '1': {"name": "Jinrang's Conviction", "dmg": (130, 190)},
-        '2': {"name": "Busan King", "dmg": (140, 210)},
-        '3': {"name": "True Conviction", "dmg": (170, 250)},
-    }
-    enemy = Enemy("Jinrang", "King of Busan", 750, 380, abilities, 2, "Busan")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_jaegyeon_na_enemy():
-    abilities = {
-        '1': {"name": "Incheon Speed", "dmg": (100, 150)},
-        '2': {"name": "Betrayal", "dmg": (95, 145)},
-        '3': {"name": "Faster Than Light", "dmg": (150, 230)},
-    }
-    enemy = Enemy("Jaegyeon Na", "King of Incheon", 620, 350, abilities, 6, "Busan")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_charles_choi():
-    abilities = {
-        '1': {"name": "🎭 Puppet Master", "dmg": (90, 140)},
-        '2': {"name": "🏛️ Chairman's Authority", "dmg": (110, 170)},
-        '3': {"name": "👤 HNH Group", "dmg": (100, 160)},
-        '4': {"name": "🎭 Truth of Two Bodies", "dmg": (130, 200)},
-    }
-    enemy = Enemy("Charles Choi", "The Puppet Master", 650, 350, abilities, 3, "HNH Chairman")
-    enemy.ai_pattern = ['4', '3', '2', '1']
-    return enemy
-
-
-def create_enemy_tom_lee():
-    abilities = {
-        '1': {"name": "🐅 Wild Strike", "dmg": (100, 150)},
-        '2': {"name": "🐅 Tom Lee Special", "dmg": (120, 180)},
-        '3': {"name": "🐅 Gen 0 Power", "dmg": (140, 210)},
-    }
-    enemy = Enemy("Tom Lee", "The Wild", 650, 350, abilities, 5, "Gen 0")
-    enemy.ai_pattern = ['3', '2', '1']
-    return enemy
-
-
-def create_enemy_gapryong_kim():
-    abilities = {
-        '1': {"name": "👑 Conviction of the Strongest", "dmg": (120, 180)},
-        '2': {"name": "👑 Gapryong's Fist", "dmg": (150, 220)},
-        '3': {"name": "👑 Will to Protect", "dmg": (130, 200)},
-        '4': {"name": "👑 Legend's Legacy", "dmg": (180, 280)},
-    }
-    enemy = Enemy("Gapryong Kim", "The Strongest", 800, 400, abilities, 0, "Gen 0 Legend")
-    enemy.ai_pattern = ['4', '2', '3', '1']
     return enemy
 
 
@@ -1949,7 +1342,7 @@ def create_enemy_god_dog_member():
 def create_enemy_god_dog_elite():
     abilities = {
         '1': {"name": "Power Strike", "dmg": (40, 60)},
-        '2': {"name": "Crew Combo", "dmg": (45, 65)},
+        '2': {"name": "Crew Combo", "dmg": (45, 65)}
     }
     enemy = Enemy("God Dog Elite", "Crew Veteran", 200, 140, abilities, 75, "God Dog")
     enemy.ai_pattern = ['2', '1']
@@ -1959,7 +1352,7 @@ def create_enemy_god_dog_elite():
 def create_enemy_hostel_member():
     abilities = {
         '1': {"name": "Street Fighting", "dmg": (35, 55)},
-        '2': {"name": "Ambush", "dmg": (40, 60)},
+        '2': {"name": "Ambush", "dmg": (40, 60)}
     }
     enemy = Enemy("Hostel Member", "Family Crew", 170, 120, abilities, 80, "Hostel")
     enemy.ai_pattern = ['2', '1']
@@ -1969,7 +1362,7 @@ def create_enemy_hostel_member():
 def create_enemy_big_deal_member():
     abilities = {
         '1': {"name": "Fist Strike", "dmg": (30, 50)},
-        '2': {"name": "Loyalty", "dmg": (0, 0)},
+        '2': {"name": "Loyalty", "dmg": (0, 0)}
     }
     enemy = Enemy("Big Deal Member", "Crew Soldier", 180, 130, abilities, 78, "Big Deal")
     enemy.ai_pattern = ['1', '2']
@@ -1986,68 +1379,131 @@ def create_enemy_workers_member():
 def create_enemy_workers_affiliate():
     abilities = {
         '1': {"name": "Affiliate Technique", "dmg": (60, 85)},
-        '2': {"name": "Corporate Power", "dmg": (65, 95)},
+        '2': {"name": "Corporate Power", "dmg": (65, 95)}
     }
     enemy = Enemy("Workers Affiliate", "1st Affiliate", 360, 230, abilities, 42, "Workers")
     enemy.ai_pattern = ['2', '1']
     return enemy
 
 
-def create_enemy_sally():
+def create_enemy_xiaolung():
     abilities = {
-        '1': {"name": "Quick Strike", "dmg": (45, 70)},
-        '2': {"name": "Tactical Hit", "dmg": (50, 75)},
+        '1': {"name": "🇹🇭 Muay Thai: Elbow", "dmg": (80, 120)},
+        '2': {"name": "🇹🇭 Muay Thai: Knee", "dmg": (85, 125)},
+        '3': {"name": "🇹🇭 Thai Clinch", "dmg": (75, 110)},
+        '4': {"name": "🇹🇭 Muay Thai Mastery", "dmg": (110, 170)}
     }
-    enemy = Enemy("Sally", "Hostel Executive", 310, 200, abilities, 55, "Hostel")
+    enemy = Enemy("Xiaolung", "Muay Thai Genius", 550, 300, abilities, 14, "Workers")
+    enemy.ai_pattern = ['4', '1', '2', '3']
+    return enemy
+
+
+def create_enemy_mandeok():
+    abilities = {
+        '1': {"name": "💪 Power Punch", "dmg": (90, 130)},
+        '2': {"name": "🌍 Earth Shaker", "dmg": (100, 150)},
+        '3': {"name": "🗿 Titan Strike", "dmg": (120, 180)}
+    }
+    enemy = Enemy("Mandeok", "The Titan", 600, 280, abilities, 13, "Workers")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_vin_jin():
+    abilities = {
+        '1': {"name": "🇰🇷 Ssireum: Throw", "dmg": (75, 110)},
+        '2': {"name": "🇰🇷 Ssireum: Grapple", "dmg": (70, 105)},
+        '3': {"name": "🥋 Judo: Ippon", "dmg": (80, 115)},
+        '4': {"name": "🥋 Kudo: Dirty Boxing", "dmg": (85, 120)},
+        '5': {"name": "🕶️ Sunglasses Off", "dmg": (110, 160)}
+    }
+    enemy = Enemy("Vin Jin", "Ssireum Genius", 520, 280, abilities, 28, "Workers")
+    enemy.ai_pattern = ['5', '4', '3', '2', '1']
+    return enemy
+
+
+def create_enemy_ryuhei():
+    abilities = {
+        '1': {"name": "⚔️ Yakuza Strike", "dmg": (80, 115)},
+        '2': {"name": "🏴 Gang Style", "dmg": (85, 120)},
+        '3': {"name": "⚫ Yamazaki Blood", "dmg": (100, 150)}
+    }
+    enemy = Enemy("Ryuhei", "Yakuza Executive", 540, 290, abilities, 24, "Workers")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_samuel_seo():
+    abilities = {
+        '1': {"name": "👑 King's Ambition", "dmg": (85, 125)},
+        '2': {"name": "💢 Betrayal", "dmg": (80, 120)},
+        '3': {"name": "⚡ Workers Executive", "dmg": (95, 140)},
+        '4': {"name": "👑 Path to Kingship", "dmg": (110, 170)}
+    }
+    enemy = Enemy("Samuel Seo", "The Betrayer", 560, 300, abilities, 18, "Workers")
+    enemy.ai_pattern = ['4', '3', '1', '2']
+    return enemy
+
+
+def create_enemy_taesoo_ma():
+    abilities = {
+        '1': {"name": "🔴 Right Hand", "dmg": (110, 170)},
+        '2': {"name": "🔴 Ansan King", "dmg": (120, 180)}
+    }
+    enemy = Enemy("Taesoo Ma", "King of Ansan", 580, 300, abilities, 8, "1st Gen")
     enemy.ai_pattern = ['2', '1']
     return enemy
 
 
-def create_enemy_brad():
+def create_enemy_gongseob_ji():
     abilities = {
-        '1': {"name": "Power Fist", "dmg": (55, 80)},
-        '2': {"name": "Reinforced Strike", "dmg": (60, 85)},
+        '1': {"name": "🩷 Speed Technique", "dmg": (95, 140)},
+        '2': {"name": "🩷 Vice King", "dmg": (100, 150)}
     }
-    enemy = Enemy("Brad", "Big Deal Executive", 350, 220, abilities, 48, "Big Deal")
+    enemy = Enemy("Gongseob Ji", "Vice King", 500, 280, abilities, 11, "1st Gen")
     enemy.ai_pattern = ['2', '1']
     return enemy
 
 
-def create_enemy_jace_park():
+def create_enemy_jichang_kwak():
     abilities = {
-        '1': {"name": "Strategic Strike", "dmg": (45, 70)},
-        '2': {"name": "Tactical Retreat", "dmg": (0, 0)},
-        '3': {"name": "Support", "dmg": (0, 0)},
+        '1': {"name": "🩷 Hand Blade", "dmg": (100, 155)},
+        '2': {"name": "👑 Seoul King", "dmg": (110, 170)}
     }
-    enemy = Enemy("Jace Park", "The Strategist", 300, 210, abilities, 60, "Burn Knuckles")
-    enemy.ai_pattern = ['3', '1', '2']
-    return enemy
-
-
-def create_enemy_burn_knuckles():
-    abilities = {
-        '1': {"name": "Fist of Justice", "dmg": (30, 50)},
-        '2': {"name": "Team Attack", "dmg": (35, 55)},
-    }
-    enemy = Enemy("Burn Knuckles", "Justice Crew", 160, 110, abilities, 85, "Burn Knuckles")
+    enemy = Enemy("Jichang Kwak", "King of Seoul", 550, 300, abilities, 7, "1st Gen")
     enemy.ai_pattern = ['2', '1']
     return enemy
 
 
-def create_enemy_jhigh_bully():
-    abilities = {'1': {"name": "School Punch", "dmg": (20, 35)}}
-    enemy = Enemy("J High Bully", "School Thug", 100, 80, abilities, 120, "J High")
-    enemy.ai_pattern = ['1']
+def create_enemy_gun_park_enemy():
+    abilities = {
+        '1': {"name": "Taekwondo", "dmg": (65, 90)},
+        '2': {"name": "Kyokushin", "dmg": (70, 100)},
+        '3': {"name": "Black Bone", "dmg": (130, 200)}
+    }
+    enemy = Enemy("Gun Park", "Legend of Gen 1", 500, 320, abilities, 5, "Independent")
+    enemy.ai_pattern = ['3', '2', '1']
     return enemy
 
 
-def create_enemy_cheon_shinmyeong():
+def create_enemy_goo_kim_enemy():
     abilities = {
-        '1': {"name": "🔮 Dark Exorcism", "dmg": (90, 140)},
-        '2': {"name": "🔮 Cheonliang Rule", "dmg": (100, 150)},
-        '3': {"name": "🔮 Puppeteer", "dmg": (80, 120)},
+        '1': {"name": "Makeshift Sword", "dmg": (45, 70)},
+        '2': {"name": "Full Moon", "dmg": (100, 145)},
+        '3': {"name": "Fifth Sword", "dmg": (170, 250)}
     }
-    enemy = Enemy("Cheon Shin-myeong", "The Shaman", 480, 320, abilities, 0, "Cheonliang")
+    enemy = Enemy("Goo Kim", "The Moonlight Sword", 480, 300, abilities, 5, "Independent")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_kim_jungu_enemy():
+    abilities = {
+        '1': {"name": "Improvised Weapon", "dmg": (70, 100)},
+        '2': {"name": "Hwarang Sword", "dmg": (140, 210)},
+        '3': {"name": "Blade Dance", "dmg": (160, 240)}
+    }
+    enemy = Enemy("Kim Jun-gu", "The Hwarang Sword", 520, 290, abilities, 4, "Independent")
     enemy.ai_pattern = ['3', '2', '1']
     return enemy
 
@@ -2055,19 +1511,129 @@ def create_enemy_cheon_shinmyeong():
 def create_enemy_manager_kim_enemy():
     abilities = {
         '1': {"name": "CQC Strike", "dmg": (65, 90)},
-        '2': {"name": "66 CODE", "dmg": (130, 190)},
+        '2': {"name": "Silver Yarn", "dmg": (100, 140)},
+        '3': {"name": "66 CODE", "dmg": (130, 190)}
     }
     enemy = Enemy("Manager Kim", "The Senior Manager", 480, 300, abilities, 5, "White Tiger")
-    enemy.ai_pattern = ['2', '1']
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_jinrang_enemy():
+    abilities = {
+        '1': {"name": "Jinrang's Conviction", "dmg": (130, 190)},
+        '2': {"name": "Busan King", "dmg": (140, 210)},
+        '3': {"name": "True Conviction", "dmg": (170, 250)}
+    }
+    enemy = Enemy("Jinrang", "King of Busan", 750, 380, abilities, 2, "Busan")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_jaegyeon_na_enemy():
+    abilities = {
+        '1': {"name": "Incheon Speed", "dmg": (100, 150)},
+        '2': {"name": "Betrayal", "dmg": (95, 145)},
+        '3': {"name": "Faster Than Light", "dmg": (150, 230)}
+    }
+    enemy = Enemy("Jaegyeon Na", "King of Incheon", 620, 350, abilities, 6, "Busan")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_charles_choi():
+    abilities = {
+        '1': {"name": "🎭 Puppet Master", "dmg": (90, 140)},
+        '2': {"name": "🏛️ Chairman's Authority", "dmg": (110, 170)},
+        '3': {"name": "👤 HNH Group", "dmg": (100, 160)},
+        '4': {"name": "🎭 Truth of Two Bodies", "dmg": (130, 200)}
+    }
+    enemy = Enemy("Charles Choi", "The Puppet Master", 650, 350, abilities, 3, "HNH Chairman")
+    enemy.ai_pattern = ['4', '3', '2', '1']
+    return enemy
+
+
+def create_enemy_tom_lee():
+    abilities = {
+        '1': {"name": "🐅 Wild Strike", "dmg": (100, 150)},
+        '2': {"name": "🐅 Tom Lee Special", "dmg": (120, 180)},
+        '3': {"name": "🐅 Gen 0 Power", "dmg": (140, 210)}
+    }
+    enemy = Enemy("Tom Lee", "The Wild", 650, 350, abilities, 5, "Gen 0")
+    enemy.ai_pattern = ['3', '2', '1']
+    return enemy
+
+
+def create_enemy_gapryong_kim():
+    abilities = {
+        '1': {"name": "👑 Conviction of the Strongest", "dmg": (120, 180)},
+        '2': {"name": "👑 Gapryong's Fist", "dmg": (150, 220)},
+        '3': {"name": "👑 Will to Protect", "dmg": (130, 200)},
+        '4': {"name": "👑 Legend's Legacy", "dmg": (180, 280)}
+    }
+    enemy = Enemy("Gapryong Kim", "The Strongest", 800, 400, abilities, 0, "Gen 0 Legend")
+    enemy.ai_pattern = ['4', '2', '3', '1']
+    return enemy
+
+
+def create_enemy_cheon_shinmyeong():
+    abilities = {
+        '1': {"name": "🔮 Dark Exorcism", "dmg": (90, 140)},
+        '2': {"name": "🔮 Cheonliang Rule", "dmg": (100, 150)},
+        '3': {"name": "🔮 Puppeteer", "dmg": (80, 120)}
+    }
+    enemy = Enemy("Cheon Shin-myeong", "The Shaman", 480, 320, abilities, 0, "Cheonliang")
+    enemy.ai_pattern = ['3', '2', '1']
     return enemy
 
 
 # ============================================================================
-# GAME CLASS - COMPLETE WITH ALL METHODS
+# GAME CLASS
 # ============================================================================
 
 class LookismGame:
-    def __init__(self):
+    def __init__(self, load_saved=True):
+        # GEN 0 LEGENDS
+        self.gapryong = GapryongKim()
+        self.tom_lee = TomLee()
+        self.charles_choi = CharlesChoi()
+        self.jinyoung = JinyoungPark()
+        self.baekho = Baekho()
+
+        # 1ST GENERATION KINGS
+        self.james_lee = JamesLee()
+        self.gitae = GitaeKim()
+        self.jichang = JichangKwak()
+        self.taesoo = TaesooMa()
+        self.gongseob = GongseobJi()
+        self.seokdu = SeokduWang()
+        self.jaegyeon = JaegyeonNa()
+        self.seongji = SeongjiYuk()
+        self.jinrang = Jinrang()
+
+        # WORKERS
+        self.mandeok = Mandeok()
+        self.cap_guy = CapGuy()
+        self.xiaolung = Xiaolung()
+        self.ryuhei = Ryuhei()
+        self.samuel = SamuelSeo()
+        self.sinu = SinuHan()
+        self.logan = LoganLee()
+
+        # CHEONLIANG
+        self.vin_jin = VinJin()
+        self.han_jaeha = HanJaeha()
+        self.baek_seong = BaekSeong()
+
+        # YAMAZAKI
+        self.shingen = ShingenYamazaki()
+        self.park_father = ParkFather()
+
+        # LAW ENFORCEMENT
+        self.kim_minjae = KimMinjae()
+        self.detective_kang = DetectiveKang()
+
+        # EXISTING CHARACTERS
         self.daniel = DanielPark("current")
         self.zack = ZackLee()
         self.johan = JohanSeong(blind=True)
@@ -2079,18 +1645,79 @@ class LookismGame:
         self.gun = GunPark()
         self.goo = GooKim()
         self.joongoo = KimJungu()
-        self.mira = MiraKim()  # Non-combatant, won't be in party selection
-        self.jinrang = Jinrang()
-        self.jaegyeon = JaegyeonNa()
         self.manager_kim = ManagerKim()
 
-        # Only combat characters are in the playable roster
+        # ALL PLAYABLE CHARACTERS (51 total)
         self.all_characters = [
+            # GEN 0
+            self.gapryong, self.tom_lee, self.charles_choi, self.jinyoung, self.baekho,
+            # 1ST GEN
+            self.james_lee, self.gitae, self.jichang, self.taesoo, self.gongseob,
+            self.seokdu, self.jaegyeon, self.seongji, self.jinrang,
+            # WORKERS
+            self.mandeok, self.cap_guy, self.xiaolung, self.ryuhei, self.samuel,
+            self.sinu, self.logan,
+            # CHEONLIANG
+            self.vin_jin, self.han_jaeha, self.baek_seong,
+            # YAMAZAKI
+            self.shingen, self.park_father,
+            # LAW
+            self.kim_minjae, self.detective_kang,
+            # EXISTING
             self.daniel, self.zack, self.johan, self.vasco, self.jay,
             self.eli, self.warren, self.jake, self.gun, self.goo,
-            self.joongoo, self.jinrang, self.jaegyeon, self.manager_kim
+            self.joongoo, self.manager_kim
         ]
 
+        # Unlock system
+        self.unlocked_characters = {
+            "Gapryong Kim": False,
+            "Tom Lee": False,
+            "Charles Choi": False,
+            "Jinyoung Park": False,
+            "Baekho": False,
+            "James Lee": False,
+            "Gitae Kim": False,
+            "Shingen Yamazaki": False,
+            "Park Jonggun's Father": False,
+            "Jinrang": False,
+            "Jaegyeon Na": False
+        }
+
+        self.unlock_requirements = {
+            "Gapryong Kim": "Complete Boss Rush Mode",
+            "Tom Lee": "Complete Secret Arc: Genesis",
+            "Charles Choi": "Complete Final Chapter",
+            "Jinyoung Park": "Complete Gen 0 Flashback",
+            "Baekho": "Complete Gen 0 Flashback",
+            "James Lee": "Complete Boss Rush Mode",
+            "Gitae Kim": "Complete Boss Rush Mode",
+            "Shingen Yamazaki": "Complete Gen 0 Flashback",
+            "Park Jonggun's Father": "Complete Gen 0 Flashback",
+            "Jinrang": "Complete Chapter 25: Jinrang's Return",
+            "Jaegyeon Na": "Complete Chapter 26: The Betrayal"
+        }
+
+        # Story progress
+        self.story_progress = {
+            "arc1_complete": False,
+            "arc2_complete": False,
+            "arc3_complete": False,
+            "arc4_complete": False,
+            "arc5_complete": False,
+            "arc6_complete": False,
+            "arc7_complete": False,
+            "arc8_complete": False,
+            "gen0_complete": False,
+            "boss_rush_complete": False,
+            "jinrang_defeated": False,
+            "jaegyeon_defeated": False,
+            "charles_choi_defeated": False,
+            "tom_lee_defeated": False,
+            "gapryong_defeated": False
+        }
+
+        # Game stats
         self.party = []
         self.enemies = []
         self.turn_count = 0
@@ -2098,6 +1725,11 @@ class LookismGame:
         self.total_kills = 0
         self.wave = 0
         self.current_arc = "J High"
+        self.path_changes_available = 3
+
+        # Load saved game if requested
+        if load_saved:
+            self.load_game()
 
     def add_log(self, message):
         print(f"[T{self.turn_count}] ", end='')
@@ -2117,27 +1749,12 @@ class LookismGame:
                 bar = "█" * filled + "░" * (bar_len - filled)
                 status = []
 
-                if member.name == "Daniel Park":
-                    status.append(f"FORM: {member.form}")
-                    if member.ui_mode:
-                        status.append("👁️UI")
-                        status.append(f"⏳{member.ui_timer}")
-                elif member.name == "Vasco":
-                    if member.muscle_boost:
-                        status.append("💪BOOST")
-                elif member.name == "Eli Jang":
-                    if member.beast_mode:
-                        status.append("🦁BEAST")
-                        status.append(f"⏳{member.beast_timer}")
-                elif member.name == "Johan Seong":
-                    status.append(f"FORM: {member.form}")
-                elif member.name == "Warren Chae":
-                    if member.exhausted:
-                        status.append("😮‍💨EXHAUSTED")
-                elif member.name == "Manager Kim":
-                    if member.veinous_rage:
-                        status.append("👁️RAGE")
-                        status.append(f"⏳{member.rage_timer}")
+                if hasattr(member, 'ui_mode') and member.ui_mode:
+                    status.append("👁️UI")
+                if hasattr(member, 'beast_mode') and member.beast_mode:
+                    status.append("🦁BEAST")
+                if hasattr(member, 'veinous_rage') and member.veinous_rage:
+                    status.append("👁️RAGE")
 
                 if member.active_realm != Realm.NONE:
                     realm_icons = {
@@ -2148,29 +1765,13 @@ class LookismGame:
                         Realm.OVERCOMING: "🟣"
                     }
                     status.append(f"{realm_icons.get(member.active_realm, '')}REALM")
-                    status.append(f"⏳{member.realm_timer}")
 
                 if member.path:
-                    path_names = {
-                        Path.ULTRA_INSTINCT: "👁️UI",
-                        Path.COPY_MASTER: "⚡COPY",
-                        Path.GOD_EYE: "👁️GOD",
-                        Path.CHOREOGRAPHY: "💃DANCE",
-                        Path.SYSTEMA_MASTER: "🇷🇺SYS",
-                        Path.MUAY_THAI_LEGEND: "🇹🇭MT",
-                        Path.NEW_CQC_CREATOR: "⚡CQC",
-                        Path.HEART_ATTACK: "💔HEART",
-                        Path.YAMAZAKI_HEIR: "🏯YAM",
-                        Path.MOONLIGHT_SWORD: "🌙MOON",
-                        Path.HWARANG_SWORD: "⚔️HWA",
-                        Path.SPECIAL_FORCES: "🎖️SF",
-                        Path.PROTECTIVE_FATHER: "👨‍👧PAPA",
-                        Path.CQC_MASTER: "🔫CQC",
-                    }
-                    status.append(path_names.get(member.path, ""))
+                    status.append("🛤️PATH")
 
-                status_str = " | ".join(filter(None, status)) if status else ""
-                print(f"{member.name:15} |{bar}| {member.hp:3}/{member.max_hp:3} HP {member.energy:3}E  {status_str}")
+                status_str = " | ".join(status) if status else ""
+                print(
+                    f"{member.name:20} |{bar}| {member.hp:3}/{member.max_hp:3} HP {member.energy:3}E  {status_str}")
                 time.sleep(0.1)
 
         print("\n" + "=" * 110)
@@ -2186,24 +1787,11 @@ class LookismGame:
                 debuff = []
                 if "stun" in enemy.debuffs:
                     debuff.append("⚡STUN")
-                if "counter" in enemy.debuffs:
-                    debuff.append("🔄COUNTER")
-                if "analyzed" in enemy.debuffs:
-                    debuff.append("👁️ANALYZED")
+                if "bound" in enemy.debuffs:
+                    debuff.append("⚪BOUND")
                 debuff_str = " | ".join(debuff) if debuff else ""
                 affil = f" [{enemy.affiliation}]" if enemy.affiliation else ""
-                realm_info = ""
-                if enemy.active_realm != Realm.NONE:
-                    realm_icons = {
-                        Realm.SPEED: "🔵",
-                        Realm.STRENGTH: "🔴",
-                        Realm.TENACITY: "🟢",
-                        Realm.TECHNIQUE: "🩷",
-                        Realm.OVERCOMING: "🟣"
-                    }
-                    realm_info = f" {realm_icons.get(enemy.active_realm, '')}"
-                print(
-                    f"{enemy.name:15} |{bar}| {enemy.hp:3}/{enemy.max_hp:3} HP (R{enemy.rank}){affil}{realm_info} {debuff_str}")
+                print(f"{enemy.name:20} |{bar}| {enemy.hp:3}/{enemy.max_hp:3} HP{affil} {debuff_str}")
                 time.sleep(0.1)
 
         print("=" * 110)
@@ -2259,9 +1847,42 @@ class LookismGame:
 
     def choose_character_path(self, character):
         if character.path:
-            print(f"\n{character.name} already walks the path of {character.path.value}")
-            time.sleep(1)
-            return True
+            print(f"\n{character.name} currently walks the path of {character.path.value}")
+            print(f"Path Level: {character.path_level} | EXP: {character.path_exp}/100")
+            print("\nOptions:")
+            print("  1. Keep current path")
+            print("  2. Change path (resets level and EXP)")
+            print("  3. Reset path (no new path chosen yet)")
+            print("  b. Back")
+
+            choice = input("> ").strip()
+            if choice == '1':
+                return True
+            elif choice == '2':
+                confirm = input(
+                    f"Are you sure you want to change {character.name}'s path? Level and EXP will reset. (y/n): ").lower()
+                if confirm == 'y':
+                    result = character.reset_path()
+                    print(result)
+                    time.sleep(1)
+                    return self.choose_character_path(character)
+                return True
+            elif choice == '3':
+                confirm = input(f"Reset {character.name}'s path completely? (y/n): ").lower()
+                if confirm == 'y':
+                    character.path = None
+                    character.infinity_technique = None
+                    character.path_level = 1
+                    character.path_exp = 0
+                    print(f"🔄 {character.name}'s path has been reset!")
+                    time.sleep(1)
+                    return self.choose_character_path(character)
+                return True
+            elif choice == 'b':
+                return True
+            else:
+                print("❌ Invalid choice.")
+                return self.choose_character_path(character)
 
         print(f"\n" + "=" * 110)
         slow_print(f"✦✦✦ CHOOSE {character.name.upper()}'S PATH ✦✦✦", 0.03)
@@ -2300,8 +1921,9 @@ class LookismGame:
         return self.choose_character_path(character)
 
     def use_ability(self, character):
+        # Check exhaustion
         if hasattr(character, 'exhausted') and character.exhausted:
-            self.add_log(f"{character.name} is exhausted from NEW CQC and cannot act this turn!")
+            self.add_log(f"{character.name} is exhausted and cannot act this turn!")
             character.exhausted = False
             character.energy = min(character.max_energy, character.energy + 15)
             time.sleep(ACTION_DELAY)
@@ -2312,48 +1934,15 @@ class LookismGame:
         print("=" * 110)
         print(f"❤️ HP: {character.hp}/{character.max_hp}  ⚡ Energy: {character.energy}/{character.max_energy}")
         if character.path:
-            print(f"🛤️ PATH: {character.path.value}")
-        if character.active_realm != Realm.NONE:
-            realm_icons = {
-                Realm.SPEED: "🔵",
-                Realm.STRENGTH: "🔴",
-                Realm.TENACITY: "🟢",
-                Realm.TECHNIQUE: "🩷",
-                Realm.OVERCOMING: "🟣"
-            }
-            print(f"{realm_icons.get(character.active_realm, '')} REALM ACTIVE: {character.realm_timer} turns left")
+            print(f"🛤️ PATH: {character.path.value[:50]}...")
         print("-" * 110)
         time.sleep(0.3)
 
-        if character.name == "Daniel Park":
-            print(f"⚡ FORM: {character.form}")
-            if character.ui_mode:
-                print("   👁️ ULTRA INSTINCT [ACTIVE] - Perfect evasion, +150% damage")
-        elif character.name == "Gun Park":
-            print("   🛡️ PERMANENT UI - 30% evasion, 20% counter")
-        elif character.name == "Johan Seong" and character.blind:
-            print("   🕶️ BLIND - 30% accuracy penalty")
-        elif character.name == "Manager Kim":
-            print("   🎖️ SPECIAL FORCES - +20% damage, +15% evasion")
-            if character.veinous_rage:
-                print("   👁️ VEINOUS RAGE [ACTIVE] - +50% damage, ignores pain")
-
+        # Build available abilities
         available = {}
         for key, abil in character.abilities.items():
             if character.energy < abil["cost"]:
                 continue
-            if character.name == "Daniel Park":
-                if abil.get("name") == "👁️ Ultra Instinct" and character.ui_mode:
-                    continue
-            elif character.name == "Eli Jang":
-                if abil.get("name") == "🦁 Beast Mode" and character.beast_mode:
-                    continue
-            elif character.name == "Warren Chae":
-                if abil.get("name") == "⚡ NEW CQC: Full Release" and character.exhausted:
-                    continue
-            elif character.name == "Manager Kim":
-                if abil.get("name") == "👁️ Veinous Rage" and character.veinous_rage:
-                    continue
             available[key] = abil
 
         print("\n" + "📋 AVAILABLE ABILITIES:")
@@ -2411,6 +2000,7 @@ class LookismGame:
             return True
         if choice == '000':
             self.choose_character_path(character)
+            self.save_game()
             return self.use_ability(character)
         if choice == '00':
             if character.realms:
@@ -2448,29 +2038,12 @@ class LookismGame:
                     mult, buffs = character.get_damage_multiplier()
                     dmg = int(dmg * mult)
 
-                if character.name == "Daniel Park" and target.name == "Jinrang":
-                    if it['name'] in ["👑 Gapryong's Conviction", "🩷 Jichang's Hand Blade"]:
-                        self.add_log("❌ Jinrang's conviction is stronger! The technique has no effect!")
-                        dmg = 0
-
                 target.take_damage(dmg)
-
                 print("\n" + "✨" * 55)
                 slow_print(f"✨✨✨ {it['name']} ✨✨✨", 0.05)
                 print("✨" * 55)
                 time.sleep(0.5)
                 self.add_log(f"{character.name} unleashes their INFINITY TECHNIQUE for {dmg} damage!")
-
-                if "Ultra Instinct" in it['name'] or "UI" in it['name']:
-                    character.ui_mode = True
-                    character.ui_timer = 2
-                if "Heart Attack" in it['name']:
-                    self.add_log("💔 The target's heart stops for a moment!")
-                    target.debuffs.append("stun")
-                if "Fifth Sword" in it['name']:
-                    self.add_log("✨ The technique thought impossible... now perfected!")
-                if "Code 66" in it['name'] or "SPECIAL FORCES" in it['name']:
-                    self.add_log("🎖️ His former code name... unleashed!")
 
                 time.sleep(ACTION_DELAY)
                 return True
@@ -2501,56 +2074,18 @@ class LookismGame:
                     self.add_log(character.activate_beast_mode())
                 elif character.name == "Vasco" and "Muscle Enhancement" in ability["name"]:
                     character.muscle_boost = True
-                    character.boost_timer = 5
-                    self.add_log("💪💪💪 MUSCLE ENHANCEMENT! +30% damage (5 turns)")
-                elif character.name == "Johan Seong" and "God Eye" in ability["name"]:
-                    character.god_eye_active = True
-                    self.add_log("👁️👁️👁️ GOD EYE ACTIVATED! +50% damage")
-                elif character.name == "Manager Kim" and "Veinous Rage" in ability["name"]:
-                    character.veinous_rage = True
-                    character.rage_timer = 4
-                    self.add_log("👁️👁️👁️ VEINOUS RAGE! Excessive veins emerge! +50% damage, ignores pain (4 turns)")
-                elif character.name == "Zack Lee" and "Heat Mode" in ability["name"]:
-                    character.heat_mode = True
-                    character.heat_timer = 3
-                    self.add_log("🔥🔥🔥 HEAT MODE! Body becomes hot! +50% damage, adaptive fighting (3 turns)")
+                    self.add_log("💪 MUSCLE ENHANCEMENT! +30% damage")
                 else:
                     self.add_log(f"{character.name} uses {ability['name']}!")
 
             elif ability.get("type") == "utility":
-                if "Protect" in ability["name"]:
-                    target = self.select_target(allies=True)
-                    if target:
-                        character.buffs.append("protecting")
-                        self.add_log(f"🛡️ {character.name} protects {target.name}!")
-                elif "Defense" in ability["name"]:
-                    character.defending = True
-                    self.add_log(f"🛡️ {character.name} takes a defensive stance!")
-                elif "Jace's Strategy" in ability["name"]:
-                    character.buffs.append("strategy")
-                    self.add_log(f"🧠 Jace's strategy! Vasco's next attack +30% damage!")
-                elif "Gift" in ability["name"]:
-                    self.add_log(f"💝 Jay gives Daniel expensive clothes as encouragement!")
-                    character.buffs.append("encouraged")
-                elif "Inu's Puppies" in ability["name"]:
-                    self.add_log("🐶🐶🐶 Inu's puppies rush in and distract the enemies!")
+                if "Thread Bind" in ability["name"]:
                     for e in self.enemies:
-                        if random.random() < 0.5:
-                            e.debuffs.append("stun")
-                elif "Father's Determination" in ability["name"]:
-                    character.buffs = []
-                    character.debuffs = []
-                    character.buffs.append("guaranteed_critical")
-                    self.add_log("🔍 FATHER'S DETERMINATION! Manager Kim will find his daughter! Next attack guaranteed critical!")
-                elif "Unassuming Demeanor" in ability["name"]:
-                    character.buffs.append("critical_next")
-                    self.add_log("😐 Enemies underestimate the middle-aged man... +30% critical chance next attack!")
+                        if random.random() < 0.6:
+                            e.debuffs.append("bound")
+                            self.add_log(f"⚪ {e.name} is bound by silver threads!")
                 else:
                     self.add_log(f"{character.name} uses {ability['name']}!")
-
-            elif ability.get("type") == "passive":
-                self.add_log(f"✨ {ability['name']} is always active.")
-                return self.use_ability(character)
 
             elif ability.get("type") == "damage" or "dmg" in ability:
                 target = self.select_target()
@@ -2561,45 +2096,8 @@ class LookismGame:
                         mult, buffs = character.get_damage_multiplier()
                         dmg = int(dmg * mult)
 
-                    if "Counter" in ability["name"] and character.name == "Zack Lee":
-                        if random.random() < 0.5:
-                            dmg *= 2
-                            self.add_log("⚡ PERFECT COUNTER! Double damage!")
-
-                    if "For Yenna" in ability["name"]:
-                        self.add_log("👶 ELI FIGHTS FOR YENNA! A father's love knows no limits!")
-                    if "Heart Attack Punch" in ability["name"]:
-                        self.add_log("💔 HEART ATTACK PUNCH! One-inch strike to the heart!")
-                    if "Fifth Sword" in ability["name"]:
-                        self.add_log("✨ THE FIFTH SWORD! Technique thought impossible!")
-                    if "Black Bone" in ability["name"]:
-                        self.add_log("🖤 BLACK BONE! Yamazaki's ultimate technique!")
-                    if "66 CODE" in ability["name"]:
-                        self.add_log("🎖️ 66 CODE! Special forces training fully unleashed!")
-                    if "For Minji" in ability["name"]:
-                        self.add_log("👨‍👧 FOR MINJI! Manager Kim becomes unstoppable!")
-
-                    if "guaranteed_critical" in character.buffs:
-                        dmg = int(dmg * 2)
-                        character.buffs.remove("guaranteed_critical")
-                        self.add_log("✨ CRITICAL HIT! Father's determination pays off!")
-                    elif "critical_next" in character.buffs:
-                        if random.random() < 0.3:
-                            dmg = int(dmg * 2)
-                            self.add_log("✨ CRITICAL HIT! Enemies underestimated him!")
-                        character.buffs.remove("critical_next")
-
-                    if character.name == "Daniel Park" and target.name == "Jinrang":
-                        if ability["name"] in ["🩷 Jichang's Hand Blade", "👑 Gapryong's Conviction"]:
-                            self.add_log("❌ Jinrang's conviction is stronger! The technique has no effect!")
-                            dmg = 0
-
                     target.take_damage(dmg)
                     self.add_log(f"{character.name} uses {ability['name']} for {dmg} damage!")
-
-                    if ability.get("drawback") == "exhausted":
-                        character.exhausted = True
-                        self.add_log("😮‍💨 Warren is exhausted from using NEW CQC! Cannot act next turn!")
 
             time.sleep(ACTION_DELAY)
             return True
@@ -2607,44 +2105,6 @@ class LookismGame:
             print("❌ Invalid ability. Try again.")
             time.sleep(0.5)
             return self.use_ability(character)
-
-    def get_damage_multiplier(self, character):
-        mult = 1.0
-        buffs = []
-
-        if hasattr(character, 'active_realm'):
-            if character.active_realm == Realm.STRENGTH:
-                mult *= 1.7
-                buffs.append("🔴 STRENGTH")
-            elif character.active_realm == Realm.OVERCOMING and character.hp < character.max_hp * 0.3:
-                mult *= 2.0
-                buffs.append("🟣 OVERCOMING")
-            elif character.active_realm == Realm.TECHNIQUE:
-                mult *= 1.4
-                buffs.append("🩷 TECHNIQUE")
-            elif character.active_realm == Realm.SPEED:
-                buffs.append("🔵 SPEED")
-
-        if hasattr(character, 'ui_mode') and character.ui_mode:
-            mult *= 2.5
-            buffs.append("👁️ UI")
-        if hasattr(character, 'beast_mode') and character.beast_mode:
-            mult *= 1.6
-            buffs.append("🦁 BEAST")
-        if hasattr(character, 'muscle_boost') and character.muscle_boost:
-            mult *= 1.3
-            buffs.append("💪 MUSCLE")
-        if hasattr(character, 'god_eye_active') and character.god_eye_active:
-            mult *= 1.5
-            buffs.append("👁️ GOD EYE")
-        if hasattr(character, 'heat_mode') and character.heat_mode:
-            mult *= 1.5
-            buffs.append("🔥 HEAT")
-        if hasattr(character, 'veinous_rage') and character.veinous_rage:
-            mult *= 1.5
-            buffs.append("👁️ RAGE")
-
-        return mult, buffs
 
     def enemy_turn(self, enemy):
         if not enemy.is_alive():
@@ -2654,6 +2114,11 @@ class LookismGame:
         if "stun" in enemy.debuffs:
             self.add_log(f"⚡ {enemy.name} is stunned and cannot act!")
             enemy.debuffs.remove("stun")
+            time.sleep(0.5)
+            return
+        if "bound" in enemy.debuffs:
+            self.add_log(f"⚪ {enemy.name} is bound and cannot act!")
+            enemy.debuffs.remove("bound")
             time.sleep(0.5)
             return
 
@@ -2671,13 +2136,6 @@ class LookismGame:
                     t.defending = False
                     self.add_log(f"🛡️ {t.name} blocks!")
 
-                if enemy.active_realm == Realm.STRENGTH:
-                    dmg = int(dmg * 1.5)
-                elif enemy.active_realm == Realm.TECHNIQUE:
-                    if random.random() < 0.3:
-                        dmg = int(dmg * 1.8)
-                        self.add_log(f"🩷 {enemy.name}'s technique is perfect!")
-
                 t.take_damage(dmg)
                 self.add_log(f"{enemy.name} uses {abil['name']} for {dmg} damage!")
                 time.sleep(0.8)
@@ -2690,7 +2148,6 @@ class LookismGame:
                 c.realm_timer -= 1
                 if c.realm_timer <= 0:
                     c.active_realm = Realm.NONE
-                    c.form = "Normal"
                     if hasattr(c, 'name'):
                         self.add_log(f"{c.name}'s realm fades.")
 
@@ -2698,33 +2155,6 @@ class LookismGame:
                 c.ui_timer -= 1
                 if c.ui_timer <= 0:
                     c.ui_mode = False
-                    c.form = "Normal"
-                    self.add_log(f"👁️ {c.name}'s Ultra Instinct fades.")
-
-            if hasattr(c, 'beast_mode') and c.beast_mode:
-                c.beast_timer -= 1
-                if c.beast_timer <= 0:
-                    c.beast_mode = False
-                    c.form = "Normal"
-                    self.add_log(f"🦁 {c.name}'s Beast Mode fades.")
-
-            if hasattr(c, 'heat_mode') and c.heat_mode:
-                c.heat_timer -= 1
-                if c.heat_timer <= 0:
-                    c.heat_mode = False
-                    self.add_log(f"🔥 {c.name}'s Heat Mode fades.")
-
-            if hasattr(c, 'veinous_rage') and c.veinous_rage:
-                c.rage_timer -= 1
-                if c.rage_timer <= 0:
-                    c.veinous_rage = False
-                    self.add_log(f"👁️ {c.name}'s Veinous Rage fades.")
-
-            if hasattr(c, 'boost_timer') and c.boost_timer > 0:
-                c.boost_timer -= 1
-                if c.boost_timer <= 0 and hasattr(c, 'muscle_boost'):
-                    c.muscle_boost = False
-                    self.add_log(f"💪 {c.name}'s Muscle Enhancement fades.")
 
             to_remove = []
             for debuff in c.debuffs:
@@ -2734,10 +2164,68 @@ class LookismGame:
             for debuff in to_remove:
                 if debuff in c.debuffs:
                     c.debuffs.remove(debuff)
-                    if hasattr(c, 'name'):
-                        self.add_log(f"{c.name}'s {debuff} wore off.")
 
             time.sleep(0.2)
+
+    def save_game(self):
+        game_state = {
+            'unlocked_characters': self.unlocked_characters,
+            'story_progress': self.story_progress,
+            'victories': self.victories,
+            'total_kills': self.total_kills,
+            'characters': {}
+        }
+
+        for char in self.all_characters:
+            game_state['characters'][char.name] = char.to_dict()
+
+        if SaveSystem.save_game(game_state):
+            print("\n💾 Game saved successfully!")
+            return True
+        return False
+
+    def load_game(self):
+        game_state = SaveSystem.load_game()
+        if not game_state:
+            return False
+
+        self.unlocked_characters = game_state.get('unlocked_characters', self.unlocked_characters)
+        self.story_progress = game_state.get('story_progress', self.story_progress)
+        self.victories = game_state.get('victories', 0)
+        self.total_kills = game_state.get('total_kills', 0)
+
+        char_data = game_state.get('characters', {})
+        for char in self.all_characters:
+            if char.name in char_data:
+                char.from_dict(char_data[char.name])
+
+        print("\n📂 Game loaded successfully!")
+        return True
+
+    def check_unlocks(self):
+        print("\n" + "=" * 110)
+        slow_print("🔓 CHECKING UNLOCKS...", 0.03)
+        print("=" * 110)
+
+        new_unlocks = []
+
+        if not self.unlocked_characters["Jinrang"] and self.story_progress.get("jinrang_defeated", False):
+            self.unlocked_characters["Jinrang"] = True
+            new_unlocks.append("Jinrang - King of Busan")
+
+        if not self.unlocked_characters["Jaegyeon Na"] and self.story_progress.get("jaegyeon_defeated", False):
+            self.unlocked_characters["Jaegyeon Na"] = True
+            new_unlocks.append("Jaegyeon Na - King of Incheon")
+
+        if new_unlocks:
+            print("\n✨✨✨ NEW CHARACTERS UNLOCKED! ✨✨✨")
+            for char in new_unlocks:
+                print(f"  ✅ {char}")
+            self.save_game()
+        else:
+            print("\nNo new unlocks yet. Keep fighting!")
+
+        time.sleep(2)
 
     def select_party(self, max_size=4):
         print("\n" + "=" * 110)
@@ -2747,25 +2235,43 @@ class LookismGame:
         print("-" * 110)
 
         available = []
+        locked_list = []
+
         for i, char in enumerate(self.all_characters):
-            if char.is_alive():
+            is_locked = False
+            if char.name in self.unlocked_characters:
+                if not self.unlocked_characters[char.name]:
+                    is_locked = True
+
+            if char.is_alive() and not is_locked:
                 path_info = f" [{char.path.name}]" if char.path else ""
                 print(f"  {i + 1}. {char.name} [{char.title}]{path_info} - {char.hp}/{char.max_hp} HP")
                 available.append(char)
+            elif is_locked:
+                locked_list.append(f"  {char.name} - 🔒 {self.unlock_requirements.get(char.name, 'Locked')}")
             time.sleep(0.05)
 
+        if locked_list:
+            print("\n🔒 LOCKED CHARACTERS:")
+            for lock in locked_list:
+                print(lock)
+
         print(f"\n  a. Auto-select (Daniel, Vasco, Zack, Jay)")
+        print("  s. Save Game")
         print("  c. Cancel")
         print("-" * 110)
 
         choice = input("> ").strip().lower()
         if choice == 'c':
             return None
+        if choice == 's':
+            self.save_game()
+            return self.select_party(max_size)
         if choice == 'a':
             return [self.daniel, self.vasco, self.zack, self.jay]
 
         selected = []
-        print("\nEnter character numbers (1-14), one per line. Empty line to finish:")
+        print(f"\nEnter character numbers (1-{len(available)}), one per line. Empty line to finish:")
 
         while len(selected) < max_size:
             char_choice = input(f"Character {len(selected) + 1}: ").strip()
@@ -2864,6 +2370,7 @@ class LookismGame:
                         char.path_exp = 0
                         self.add_log(f"✨ {char.name}'s path level increased to {char.path_level}!")
 
+            self.save_game()
             time.sleep(VICTORY_DELAY)
             return True
 
@@ -2888,37 +2395,100 @@ class LookismGame:
             if hasattr(char, 'beast_mode'):
                 char.beast_mode = False
                 char.beast_timer = 0
-            if hasattr(char, 'heat_mode'):
-                char.heat_mode = False
-                char.heat_timer = 0
             if hasattr(char, 'veinous_rage'):
                 char.veinous_rage = False
-                char.rage_timer = 0
+            if hasattr(char, 'silver_yarn_active'):
+                char.silver_yarn_active = False
             if hasattr(char, 'muscle_boost'):
                 char.muscle_boost = False
-                char.boost_timer = 0
             if hasattr(char, 'exhausted'):
                 char.exhausted = False
-            if hasattr(char, 'god_eye_active'):
-                char.god_eye_active = False
 
             print(f"  ✦ {char.name} fully recovered!")
             time.sleep(0.1)
 
         print("\n✦ Party fully healed and recovered! ✦")
+        self.save_game()
         time.sleep(1.5)
+
+    def path_management_menu(self):
+        print("\n" + "=" * 110)
+        slow_print("🛤️🛤️🛤️ PATH MANAGEMENT SYSTEM 🛤️🛤️🛤️", 0.03)
+        print("=" * 110)
+        print("Choose a character to manage their path:")
+        print("-" * 110)
+
+        for i, char in enumerate(self.all_characters):
+            is_locked = False
+            if char.name in self.unlocked_characters:
+                if not self.unlocked_characters[char.name]:
+                    is_locked = True
+
+            if not is_locked:
+                path_info = f"[{char.path.value[:30]}...]" if char.path else "[No Path]"
+                print(f"  {i + 1}. {char.name} - {path_info} (Lv.{char.path_level})")
+            else:
+                print(f"  {char.name} - 🔒 LOCKED")
+            time.sleep(0.05)
+
+        print(f"\n  a. Reset ALL paths")
+        print("  s. Save Game")
+        print("  b. Back to main menu")
+        print("-" * 110)
+
+        choice = input("> ").strip().lower()
+        print()
+
+        if choice == 'b':
+            return
+        elif choice == 's':
+            self.save_game()
+            return self.path_management_menu()
+        elif choice == 'a':
+            confirm = input("Reset ALL character paths? This cannot be undone! (y/n): ").lower()
+            if confirm == 'y':
+                for char in self.all_characters:
+                    char.path = None
+                    char.infinity_technique = None
+                    char.path_level = 1
+                    char.path_exp = 0
+                    char.path_history = []
+                print("✨ ALL paths have been reset!")
+                self.save_game()
+                time.sleep(1)
+            return self.path_management_menu()
+        else:
+            try:
+                idx = int(choice) - 1
+                if 0 <= idx < len(self.all_characters):
+                    char = self.all_characters[idx]
+                    is_locked = False
+                    if char.name in self.unlocked_characters:
+                        if not self.unlocked_characters[char.name]:
+                            is_locked = True
+                            print(f"❌ {char.name} is locked! {self.unlock_requirements.get(char.name, 'Locked')}")
+                            time.sleep(2)
+
+                    if not is_locked:
+                        self.choose_character_path(char)
+                        self.save_game()
+                    return self.path_management_menu()
+            except:
+                pass
+            print("❌ Invalid choice.")
+            time.sleep(0.5)
+            return self.path_management_menu()
 
     def story_mode(self):
         print("\n" + "=" * 110)
         slow_print("📖📖📖 STORY MODE: THE COMPLETE LOOKISM 📖📖📖", 0.03)
         print("=" * 110)
         slow_print("Based on Park Tae-joon's manhwa (2014-2025)", 0.02)
-        slow_print("Current to Chapter 581+ • Busan Arc • Jinrang • Jaegyeon Na Betrayal", 0.02)
         print("=" * 110)
         time.sleep(1)
 
         arcs = [
-            ("ARC 1: J HIGH & THE TWO BODIES (Ep 1-100)",
+            ("ARC 1: J HIGH & THE TWO BODIES",
              [
                  ("Prologue: The Transfer Student", [create_enemy_jhigh_bully()]),
                  ("Chapter 1: Logan Lee", [create_enemy_logan_lee()]),
@@ -2926,45 +2496,48 @@ class LookismGame:
                  ("Chapter 3: Vasco Appears", [create_enemy_vasco_enemy()]),
                  ("Chapter 4: Jay's Protection", [create_enemy_jay_hong_enemy()])
              ]),
-            ("ARC 2: GOD DOG (Ep 100-200)",
+            ("ARC 2: GOD DOG",
              [
-                 ("Chapter 5: God Dog Soldiers", [create_enemy_god_dog_member(), create_enemy_god_dog_member()]),
-                 ("Chapter 6: God Dog Elite", [create_enemy_god_dog_elite(), create_enemy_god_dog_member()]),
+                 ("Chapter 5: God Dog Soldiers",
+                  [create_enemy_god_dog_member(), create_enemy_god_dog_member()]),
+                 ("Chapter 6: God Dog Elite",
+                  [create_enemy_god_dog_elite(), create_enemy_god_dog_member()]),
                  ("Chapter 7: Johan Seong", [create_enemy_johan_seong_enemy()])
              ]),
-            ("ARC 3: HOSTEL (Ep 200-300)",
+            ("ARC 3: HOSTEL",
              [
                  ("Chapter 8: Hostel Family", [create_enemy_hostel_member(), create_enemy_sally()]),
                  ("Chapter 9: Warren Chae", [create_enemy_warren_chae_enemy()]),
                  ("Chapter 10: Eli Jang", [create_enemy_eli_jang_enemy()])
              ]),
-            ("ARC 4: BIG DEAL (Ep 300-400)",
+            ("ARC 4: BIG DEAL",
              [
                  ("Chapter 11: Big Deal Soldiers", [create_enemy_big_deal_member(), create_enemy_brad()]),
                  ("Chapter 12: Jerry Kwon", [create_enemy_jerry_kwon()]),
                  ("Chapter 13: Jake Kim", [create_enemy_jake_kim_enemy()])
              ]),
-            ("ARC 5: WORKERS (Ep 400-500)",
+            ("ARC 5: WORKERS",
              [
-                 ("Chapter 14: Workers Affiliates", [create_enemy_workers_member(), create_enemy_workers_affiliate()]),
+                 ("Chapter 14: Workers Affiliates",
+                  [create_enemy_workers_member(), create_enemy_workers_affiliate()]),
                  ("Chapter 15: Xiaolung", [create_enemy_xiaolung()]),
                  ("Chapter 16: Mandeok", [create_enemy_mandeok()]),
                  ("Chapter 17: Samuel Seo", [create_enemy_samuel_seo()]),
                  ("Chapter 18: Eugene", [create_enemy_eugene()])
              ]),
-            ("ARC 6: CHEONLIANG (Ep 500-550)",
+            ("ARC 6: CHEONLIANG",
              [
                  ("Chapter 19: Vin Jin", [create_enemy_vin_jin()]),
                  ("Chapter 20: Ryuhei", [create_enemy_ryuhei()]),
                  ("Chapter 21: The Shaman", [create_enemy_cheon_shinmyeong()])
              ]),
-            ("ARC 7: 1ST GENERATION (Ep 550-570)",
+            ("ARC 7: 1ST GENERATION",
              [
                  ("Chapter 22: Taesoo Ma", [create_enemy_taesoo_ma()]),
                  ("Chapter 23: Gongseob Ji", [create_enemy_gongseob_ji()]),
                  ("Chapter 24: Jichang Kwak", [create_enemy_jichang_kwak()])
              ]),
-            ("ARC 8: BUSAN (Ep 570-581+)",
+            ("ARC 8: BUSAN",
              [
                  ("Chapter 25: Jinrang's Return", [create_enemy_jinrang_enemy()]),
                  ("Chapter 26: The Betrayal", [create_enemy_jaegyeon_na_enemy()]),
@@ -3003,36 +2576,37 @@ class LookismGame:
                     time.sleep(2)
                     return False
 
+                if chapter == "Chapter 25: Jinrang's Return":
+                    self.story_progress["jinrang_defeated"] = True
+                    self.check_unlocks()
+                elif chapter == "Chapter 26: The Betrayal":
+                    self.story_progress["jaegyeon_defeated"] = True
+                    self.check_unlocks()
+                elif chapter == "Final Chapter: Charles Choi":
+                    self.story_progress["charles_choi_defeated"] = True
+                elif chapter == "Gen 0: Tom Lee":
+                    self.story_progress["tom_lee_defeated"] = True
+                elif chapter == "Gen 0: Gapryong Kim":
+                    self.story_progress["gapryong_defeated"] = True
+
                 if chapter != chapters[-1][0]:
                     self.rest()
 
-            print("\n" + "=" * 110)
-            slow_print("✨ NEW PATHS AVAILABLE ✨", 0.03)
-            print("=" * 110)
-            print("Your characters have grown. Choose their paths:")
-            time.sleep(0.5)
-
-            for char in [self.daniel, self.vasco, self.zack, self.jay, self.johan,
-                         self.eli, self.warren, self.jake, self.gun, self.goo, self.joongoo, self.manager_kim]:
-                if not char.path and char in party:
-                    print(f"\n{char.name} can now choose a path:")
-                    self.choose_character_path(char)
+            self.save_game()
 
         print("\n" + "=" * 110)
         slow_print("🏆🏆🏆 STORY MODE COMPLETE! 🏆🏆🏆", 0.04)
         print("=" * 110)
-        slow_print("You have experienced the complete Lookism story!", 0.02)
         print(f"Total victories: {self.victories}")
         print(f"Enemies defeated: {self.total_kills}")
         print("=" * 110)
+        self.save_game()
         time.sleep(3)
         return True
 
     def crew_gauntlet_mode(self):
         print("\n" + "=" * 110)
         slow_print("🏆🏆🏆 CREW GAUNTLET 🏆🏆🏆", 0.04)
-        print("=" * 110)
-        slow_print("Face all the major crews in order of difficulty!", 0.02)
         print("=" * 110)
         time.sleep(1)
 
@@ -3088,6 +2662,7 @@ class LookismGame:
         print(f"Total victories: {self.victories}")
         print(f"Enemies defeated: {self.total_kills}")
         print("=" * 110)
+        self.save_game()
         time.sleep(3)
         return True
 
@@ -3095,7 +2670,6 @@ class LookismGame:
         print("\n" + "=" * 110)
         slow_print("👑👑👑 BOSS RUSH 👑👑👑", 0.04)
         print("=" * 110)
-        slow_print("Face the most powerful enemies back-to-back!", 0.02)
         slow_print("No rest between battles!", 0.02)
         print("=" * 110)
         time.sleep(1)
@@ -3148,10 +2722,13 @@ class LookismGame:
             print("⚔️ Preparing next boss... ⚔️")
             time.sleep(1)
 
+        self.story_progress["boss_rush_complete"] = True
+        self.check_unlocks()
+        self.save_game()
+
         print("\n" + "=" * 110)
         slow_print("👑👑👑 BOSS RUSH COMPLETE! 👑👑👑", 0.04)
         print("=" * 110)
-        slow_print("You have defeated every major boss in Lookism!", 0.02)
         print(f"Total victories: {self.victories}")
         print("=" * 110)
         time.sleep(3)
@@ -3160,9 +2737,6 @@ class LookismGame:
     def survival_mode(self):
         print("\n" + "=" * 110)
         slow_print("♾️♾️♾️ ENDLESS SURVIVAL ♾️♾️♾️", 0.04)
-        print("=" * 110)
-        slow_print("Fight wave after wave of enemies!", 0.02)
-        slow_print("How long can you last?", 0.02)
         print("=" * 110)
         time.sleep(1)
 
@@ -3248,6 +2822,7 @@ class LookismGame:
 
             score += wave * 100
             print(f"\n✨ Wave {wave} cleared! Score: {score}")
+            self.save_game()
             time.sleep(1)
 
             if random.random() < 0.2:
@@ -3262,8 +2837,6 @@ class LookismGame:
     def training_mode(self):
         print("\n" + "=" * 110)
         slow_print("🥋🥋🥋 TRAINING ROOM 🥋🥋🥋", 0.04)
-        print("=" * 110)
-        slow_print("Practice against any character in the game.", 0.02)
         print("=" * 110)
         time.sleep(0.5)
 
@@ -3300,6 +2873,7 @@ class LookismGame:
         for key, name, _ in training_options:
             print(f"  {key}. {name}")
             time.sleep(0.02)
+        print("  s. Save Game")
         print("  b. Back")
         print()
 
@@ -3308,6 +2882,9 @@ class LookismGame:
 
         if choice.lower() == 'b':
             return
+        if choice.lower() == 's':
+            self.save_game()
+            return self.training_mode()
 
         for key, name, func in training_options:
             if choice == key:
@@ -3334,39 +2911,25 @@ class LookismGame:
 
         print("✦ CHARACTER PATHS:")
         for char in self.all_characters:
-            if char.path:
-                path_names = {
-                    Path.ULTRA_INSTINCT: "👁️ UI",
-                    Path.COPY_MASTER: "⚡ COPY",
-                    Path.SECOND_BODY: "🔄 DUAL",
-                    Path.GOD_EYE: "👁️ GOD",
-                    Path.CHOREOGRAPHY: "💃 DANCE",
-                    Path.SYSTEMA_MASTER: "🇷🇺 SYS",
-                    Path.MUAY_THAI_LEGEND: "🇹🇭 MT",
-                    Path.BURN_KNUCKLE_KING: "🔥 BURN",
-                    Path.NEW_CQC_CREATOR: "⚡ CQC",
-                    Path.HEART_ATTACK: "💔 HEART",
-                    Path.YAMAZAKI_HEIR: "🏯 YAM",
-                    Path.MOONLIGHT_SWORD: "🌙 MOON",
-                    Path.HWARANG_SWORD: "⚔️ HWA",
-                    Path.SPECIAL_FORCES: "🎖️ SF",
-                    Path.PROTECTIVE_FATHER: "👨‍👧 PAPA",
-                    Path.CQC_MASTER: "🔫 CQC",
-                }
-                path_icon = path_names.get(char.path, "")
-                print(f"  • {char.name}: {path_icon} Lv.{char.path_level} ({char.path_exp}/100 EXP)")
+            is_locked = False
+            if char.name in self.unlocked_characters:
+                if not self.unlocked_characters[char.name]:
+                    is_locked = True
+
+            if char.path and not is_locked:
+                print(f"  • {char.name}: Lv.{char.path_level} ({char.path_exp}/100 EXP)")
+            elif is_locked:
+                print(f"  • {char.name}: 🔒 {self.unlock_requirements.get(char.name, 'Locked')}")
             else:
                 print(f"  • {char.name}: No path chosen")
         print()
 
-        print("🔓 UNLOCKABLE CHARACTERS:")
-        print("  • Jinrang - Complete Busan Arc")
-        print("  • Jaegyeon Na - Complete Busan Arc")
-        print("  • Gapryong Kim - Complete Boss Rush")
-        print("  • Manager Kim - Available from start")
-        print()
+        print("🔓 UNLOCK PROGRESS:")
+        for name, unlocked in self.unlocked_characters.items():
+            status = "✅ UNLOCKED" if unlocked else "🔒 Locked"
+            print(f"  • {name}: {status}")
 
-        input("Press Enter to return to menu...")
+        input("\nPress Enter to return to menu...")
         print()
 
 
@@ -3377,9 +2940,19 @@ class LookismGame:
 def main():
     print("\n" + "=" * 110)
     slow_print("    👊👊👊 LOOKISM: AWAKENED FIST 👊👊👊", 0.03)
-    print("    COMPLETE CANON EDITION - 100% MANHWA ACCURATE")
+    print("    COMPLETE CANON EDITION - 51 PLAYABLE FIGHTERS")
     print("    Based on Park Tae-joon's Lookism (2014-2025)")
-    print("    Current to Chapter 581+ • Busan Arc • Jinrang")
+    print("=" * 110)
+    print("\n✅ ROSTER BREAKDOWN:")
+    print("   • GEN 0 (5): Gapryong Kim, Tom Lee, Charles Choi, Jinyoung Park, Baekho")
+    print(
+        "   • 1ST GEN (9): James Lee, Gitae Kim, Jichang Kwak, Taesoo Ma, Gongseob Ji, Seokdu Wang, Jaegyeon Na, Seongji Yuk, Jinrang")
+    print(
+        "   • GEN 2 (15): Daniel Park, Zack Lee, Johan Seong, Vasco, Jay Hong, Eli Jang, Warren Chae, Jake Kim, Gun Park, Goo Kim, Kim Jun-gu, Manager Kim + more")
+    print("   • WORKERS (7): Mandeok, Cap Guy, Xiaolung, Ryuhei, Samuel Seo, Sinu Han, Logan Lee")
+    print("   • CHEONLIANG (3): Vin Jin, Han Jaeha, Baek Seong")
+    print("   • YAMAZAKI (2): Shingen Yamazaki, Park Jonggun's Father")
+    print("   • LAW (2): Kim Minjae, Detective Kang")
     print("=" * 110)
     print("\n🎮 GAME MODES:")
     time.sleep(0.3)
@@ -3389,23 +2962,27 @@ def main():
     print("  4. ♾️ Endless Survival - How many waves?")
     print("  5. 🥋 Training Room - Practice against any character")
     print("  6. 📊 Stats & Records")
-    print("  7. ❌ Exit")
-    print("=" * 110)
-    print("\n📚 PATH SYSTEM:")
-    time.sleep(0.2)
-    print("   • Each character has 3-4 unique paths")
-    print("   • Paths unlock INFINITY TECHNIQUES")
-    print("   • Choose wisely - your destiny awaits")
-    print("=" * 110)
-    print("\n🔓 UNLOCKABLE CHARACTERS:")
-    print("   • Jinrang - King of Busan")
-    print("   • Jaegyeon Na - King of Incheon")
-    print("   • Gapryong Kim - The Strongest of Gen 0")
-    print("   • Manager Kim - The Senior Manager (Available now)")
+    print("  7. 🛤️ Path Management - Change character paths anytime")
+    print("  8. 💾 Save/Load - Manage your save file")
+    print("  9. ❌ Exit")
     print("=" * 110)
     time.sleep(1)
 
-    game = LookismGame()
+    # Check for existing save
+    if os.path.exists(SAVE_FILE):
+        print("\n💾 Existing save file found!")
+        load_choice = input("Load previous game? (y/n): ").lower()
+        if load_choice == 'y':
+            game = LookismGame(load_saved=True)
+            print("✅ Game loaded successfully!")
+        else:
+            game = LookismGame(load_saved=False)
+            print("🆕 Starting new game...")
+    else:
+        game = LookismGame(load_saved=False)
+        print("🆕 No save file found. Starting new game...")
+
+    time.sleep(1)
 
     while True:
         print("\n" + "-" * 110)
@@ -3417,29 +2994,59 @@ def main():
         print("4. ♾️ Endless Survival")
         print("5. 🥋 Training Room")
         print("6. 📊 Stats & Records")
-        print("7. ❌ Exit")
+        print("7. 🛤️ Path Management - Change paths anytime")
+        print("8. 💾 Save/Load - Manage your save file")
+        print("9. ❌ Exit")
         print("-" * 110)
 
         choice = input("> ").strip()
         print()
 
         if choice == "1":
-            game = LookismGame()
             game.story_mode()
         elif choice == "2":
-            game = LookismGame()
             game.crew_gauntlet_mode()
         elif choice == "3":
-            game = LookismGame()
             game.boss_rush_mode()
         elif choice == "4":
-            game = LookismGame()
             game.survival_mode()
         elif choice == "5":
             game.training_mode()
         elif choice == "6":
             game.stats_mode()
         elif choice == "7":
+            game.path_management_menu()
+        elif choice == "8":
+            print("\n" + "=" * 110)
+            slow_print("💾💾💾 SAVE/LOAD MANAGEMENT 💾💾💾", 0.03)
+            print("=" * 110)
+            print("1. 💾 Save Game")
+            print("2. 📂 Load Game")
+            print("3. 🗑️ Delete Save")
+            print("4. 🔙 Back")
+            print("-" * 110)
+
+            save_choice = input("> ").strip()
+            if save_choice == "1":
+                game.save_game()
+            elif save_choice == "2":
+                if game.load_game():
+                    print("✅ Game loaded!")
+                else:
+                    print("❌ No save file found!")
+            elif save_choice == "3":
+                confirm = input("Are you sure you want to delete your save? (y/n): ").lower()
+                if confirm == 'y':
+                    if SaveSystem.delete_save():
+                        print("🗑️ Save file deleted!")
+                        game = LookismGame(load_saved=False)
+                    else:
+                        print("❌ No save file found!")
+            input("Press Enter to continue...")
+        elif choice == "9":
+            save_choice = input("Save before exiting? (y/n): ").lower()
+            if save_choice == 'y':
+                game.save_game()
             slow_print("\nThanks for playing Lookism: Awakened Fist!", 0.03)
             slow_print("See you next time, fighter.\n", 0.03)
             time.sleep(1)

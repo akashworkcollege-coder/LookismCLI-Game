@@ -1,0 +1,347 @@
+{
+    "unlocked_characters": {
+        "Jinrang": true,
+        "Jaegyeon Na": true,
+        "Gapryong Kim": true
+    },
+    "story_progress": {
+        "arc1_complete": true,
+        "arc2_complete": true,
+        "arc3_complete": true,
+        "arc4_complete": true,
+        "arc5_complete": true,
+        "arc6_complete": true,
+        "arc7_complete": true,
+        "arc8_complete": true,
+        "boss_rush_complete": true,
+        "jinrang_defeated": true,
+        "jaegyeon_defeated": true,
+        "charles_choi_defeated": true,
+        "tom_lee_defeated": true,
+        "gapryong_defeated": true
+    },
+    "victories": 1,
+    "total_kills": 1,
+    "characters": {
+        "Gapryong Kim": {
+            "name": "Gapryong Kim",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 900,
+            "energy": 400
+        },
+        "Tom Lee": {
+            "name": "Tom Lee",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 850,
+            "energy": 380
+        },
+        "Charles Choi": {
+            "name": "Charles Choi",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 800,
+            "energy": 360
+        },
+        "Jinyoung Park": {
+            "name": "Jinyoung Park",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 780,
+            "energy": 350
+        },
+        "Baekho": {
+            "name": "Baekho",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 820,
+            "energy": 370
+        },
+        "James Lee": {
+            "name": "James Lee",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 880,
+            "energy": 390
+        },
+        "Gitae Kim": {
+            "name": "Gitae Kim",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 860,
+            "energy": 380
+        },
+        "Jichang Kwak": {
+            "name": "Jichang Kwak",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 800,
+            "energy": 360
+        },
+        "Taesoo Ma": {
+            "name": "Taesoo Ma",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 820,
+            "energy": 350
+        },
+        "Gongseob Ji": {
+            "name": "Gongseob Ji",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 750,
+            "energy": 340
+        },
+        "Seokdu Wang": {
+            "name": "Seokdu Wang",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 780,
+            "energy": 330
+        },
+        "Jaegyeon Na": {
+            "name": "Jaegyeon Na",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 770,
+            "energy": 360
+        },
+        "Seongji Yuk": {
+            "name": "Seongji Yuk",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 820,
+            "energy": 370
+        },
+        "Jinrang": {
+            "name": "Jinrang",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 830,
+            "energy": 380
+        },
+        "Mandeok": {
+            "name": "Mandeok",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 780,
+            "energy": 320
+        },
+        "Cap Guy": {
+            "name": "Cap Guy",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 750,
+            "energy": 340
+        },
+        "Xiaolung": {
+            "name": "Xiaolung",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 720,
+            "energy": 330
+        },
+        "Ryuhei": {
+            "name": "Ryuhei",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 700,
+            "energy": 310
+        },
+        "Samuel Seo": {
+            "name": "Samuel Seo",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 730,
+            "energy": 330
+        },
+        "Sinu Han": {
+            "name": "Sinu Han",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 710,
+            "energy": 340
+        },
+        "Logan Lee": {
+            "name": "Logan Lee",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 550,
+            "energy": 280
+        },
+        "Vin Jin": {
+            "name": "Vin Jin",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 680,
+            "energy": 310
+        },
+        "Han Jaeha": {
+            "name": "Han Jaeha",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 600,
+            "energy": 175
+        },
+        "Baek Seong": {
+            "name": "Baek Seong",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 590,
+            "energy": 300
+        },
+        "Shingen Yamazaki": {
+            "name": "Shingen Yamazaki",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 950,
+            "energy": 260
+        },
+        "Park Jonggun's Father": {
+            "name": "Park Jonggun's Father",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 800,
+            "energy": 380
+        },
+        "Kim Minjae": {
+            "name": "Kim Minjae",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 550,
+            "energy": 280
+        },
+        "Detective Kang": {
+            "name": "Detective Kang",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 570,
+            "energy": 290
+        },
+        "Daniel Park": {
+            "name": "Daniel Park",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 420,
+            "energy": 300
+        },
+        "Zack Lee": {
+            "name": "Zack Lee",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 380,
+            "energy": 280
+        },
+        "Johan Seong": {
+            "name": "Johan Seong",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 400,
+            "energy": 300
+        },
+        "Vasco": {
+            "name": "Vasco",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 450,
+            "energy": 260
+        },
+        "Jay Hong": {
+            "name": "Jay Hong",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 380,
+            "energy": 270
+        },
+        "Eli Jang": {
+            "name": "Eli Jang",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 410,
+            "energy": 260
+        },
+        "Warren Chae": {
+            "name": "Warren Chae",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 390,
+            "energy": 260
+        },
+        "Jake Kim": {
+            "name": "Jake Kim",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 430,
+            "energy": 270
+        },
+        "Gun Park": {
+            "name": "Gun Park",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 500,
+            "energy": 320
+        },
+        "Goo Kim": {
+            "name": "Goo Kim",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 480,
+            "energy": 300
+        },
+        "Kim Jun-gu": {
+            "name": "Kim Jun-gu",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 520,
+            "energy": 290
+        },
+        "Manager Kim": {
+            "name": "Manager Kim",
+            "path": null,
+            "path_level": 1,
+            "path_exp": 0,
+            "hp": 480,
+            "energy": 165
+        }
+    }
+}

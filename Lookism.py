@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LOOKISM: AWAKENED FIST - COMPLETE CANON EDITION v12
+LOOKISM: AWAKENED FIST - COMPLETE CANON EDITION v22
 ALL 39 PLAYABLE CHARACTERS — Manhwa Accurate
 Based on Park Tae-joon's Lookism (2014-2025) & Manager Kim (Spin-off)
 
@@ -188,7 +188,7 @@ class Path(Enum):
 
     # GEN 2 CREW LEADERS
     DANIEL_UI = "👁️ Daniel Park's Ultra Instinct"
-    DANIEL_COPY = "⚡ Daniel Park's Copy Master"
+    DANIEL_COPY = "👁️ Daniel Park's Five Senses Path (True Body)"
     ZACK_IRON = "🔨 Zack Lee's Iron Boxing"
     JOHAN_GOD_EYE = "👁️ Johan Seong's God Eye"
     JOHAN_CHOREOGRAPHY = "💃 Johan Seong's Choreography"
@@ -270,8 +270,8 @@ INFINITY_TECHNIQUES = {
     },
     Path.JAMES_LEE_INVISIBLE: {
         "name": "👑 INFINITE JAMES: The Invisible King",
-        "cost": 150, "dmg": (270, 390),
-        "desc": "James Lee's perfected invisible attacks. The peak of the 1st Generation."
+        "cost": 150, "dmg": (310, 430),
+        "desc": "CANON: James Lee dismantled the entire 1st Generation alone. Invisible kick at full power — surpasses even Gapryong's crew members. The pinnacle of speed mastery."
     },
     Path.GITAE_KIM: {
         "name": "⚡ INFINITE GITAE: King of Seoul's Wrath",
@@ -319,9 +319,11 @@ INFINITY_TECHNIQUES = {
         "desc": "Daniel's Ultra Instinct. Eyes invert to pure black — the body fights with zero thought, only instinct. Hereditary to the Yamazaki bloodline; how Daniel has it remains unknown."
     },
     Path.DANIEL_COPY: {
-        "name": "⚡ INFINITE COPY: Perfect Replication",
-        "cost": 90, "dmg": (220, 320),
-        "desc": "Daniel's copy ability at its peak. Any technique becomes his own."
+        "name": "👁️ INFINITE FIVE SENSES: Total Foresight",
+        "cost": 90, "dmg": (200, 300),
+        "desc": "CANON (True Body path): Combines copying + maximized senses — predicts every attack "
+                "AND defensive maneuver. Opposite of Johan's infinite strike. "
+                "Pacheon Jo: 'He is foreseeing ALL my moves.' Exhausting to use."
     },
     Path.ZACK_IRON: {
         "name": "🔨 INFINITE IRON BOXING: Shining Star",
@@ -580,6 +582,11 @@ class Character:
             else:
                 dmg = int(dmg * 0.85)
 
+        # FIVE SENSES PATH PREDICTION (Daniel): 20% chance to fully deflect non-armor_break hit
+        if getattr(self, 'path_prediction', False) and not armor_break:
+            if random.random() < 0.20:
+                dmg = 0  # deflected — Daniel saw the attack direction and moved first
+
         # ENDURANCE MASTERY nullify (GongseobJi): 30% chance to completely absorb hit
         if hasattr(self, 'endurance_nullify_chance') and not armor_break:
             if random.random() < self.endurance_nullify_chance:
@@ -589,14 +596,45 @@ class Character:
         if hasattr(self, 'gen0_durability') and not armor_break:
             dmg = int(dmg * 0.80)
 
-        # PATRIARCH AURA (Shingen): 15% reduction when Shingen is on player's team
-        # Applied via character receiving damage — handled here
+        # TITAN IMMOVABLE (Mandeok): 20% dmg reduction — his mass absorbs impacts
+        if hasattr(self, 'immovable_reduction') and not armor_break:
+            dmg = int(dmg * (1.0 - self.immovable_reduction))
+
+        # PATRIARCH AURA (Shingen): 15% personal damage reduction (iron body + presence).
+        # Shingen's own body is hardened by decades of combat — Gen 0 patriarch.
         if hasattr(self, 'patriarch_aura') and not armor_break:
             dmg = int(dmg * 0.85)
 
         self.hp -= dmg
         if self.hp < 0:
             self.hp = 0
+        # GUN PARK SHIRO ONI: triggered at <20% HP (pushed to limit)
+        if hasattr(self, 'uncontrolled_ui_active') and not self.uncontrolled_ui_active and not getattr(self, 'uncontrolled_ui_triggered', False):
+            if self.max_hp > 0 and self.hp / self.max_hp < 0.20 and self.hp > 0:
+                self.uncontrolled_ui_active = True
+                self.uncontrolled_ui_triggered = True
+                self.temp_buffs.append({'name': "ShiroOni", 'dmg_mult': 1.0, 'def_mult': 1.0, 'turns': 3})
+                print("\n" + "⚫" * 20)
+                print(f"⚫ SHIRO ONI — WHITE GHOST! {self.name}'s Yamazaki UI fully unleashes! x2.0 extra dmg for 3 turns!")
+                print("⚫" * 20 + "\n")
+
+        # JINRANG LAST STAND: below 30% HP, once per battle — survive at 1HP
+        if hasattr(self, 'last_stand_available') and self.last_stand_available:
+            if self.hp <= 0 and (self.max_hp > 0):
+                self.hp = 1
+                self.last_stand_available = False
+                self.last_stand_burst = True
+                self.last_stand_burst_timer = 2
+                # Note: the burst timer is tracked in cleanup, multiplier in get_damage_multiplier
+                print("\n" + "👑" * 20)
+                print(f"👑 LAST STAND! {self.name} refuses to fall! Survives at 1HP! Conviction BURSTS! +70% dmg for 2 turns!")
+                print("👑" * 20 + "\n")
+            elif self.hp > 0 and self.hp < self.max_hp * 0.30:
+                self.last_stand_burst = True
+                if self.last_stand_burst_timer <= 0:
+                    self.last_stand_burst_timer = 2
+                    self.last_stand_available = False
+                    print(f"👑 {self.name}'s conviction surges at critical HP! +70% dmg for 2 turns!")
 
     def heal(self, amount):
         self.hp += amount
@@ -640,8 +678,15 @@ class Character:
                 buffs.append("🟣 OVERCOMING")
 
         if self.ui_mode:
-            mult *= 2.5
-            buffs.append("👁️ UI")
+            # CANON: Perfect Body UI = full unconscious max potential (2.5x)
+            # True Body Subconsciousness = partial/uncontrolled, less power generation (1.5x)
+            # All other characters with ui_mode use 2.5x
+            if hasattr(self, 'active_body') and self.active_body == 'true' and 'SUBCONSCIOUSNESS' in getattr(self, 'form', ''):
+                mult *= 1.50
+                buffs.append("👁️ SUBCONSCIOUSNESS(1.5x)")
+            else:
+                mult *= 2.5
+                buffs.append("👁️ UI(2.5x)")
 
         if self.beast_mode:
             mult *= 1.6
@@ -668,6 +713,59 @@ class Character:
             mult *= level_bonus
             buffs.append(f"🛤️Lv{self.path_level}(+{round((level_bonus-1)*100)}%)")
 
+        # PATH-SPECIFIC PASSIVE BONUSES: thematic bonus when certain path is chosen
+        # These stack with level bonus and represent path focus amplifying the character's core mechanic.
+        if self.path:
+            _pname = self.path.name
+            # Copy paths: +10% when using instinctive copying
+            if _pname in ('JINYOUNG_COPY', 'JOHAN_GOD_EYE'):
+                mult *= 1.10
+                buffs.append("🔄COPY(+10%)")
+            # UI / Constant paths: +10% additional awareness bonus
+            elif _pname in ('DANIEL_UI', 'GUN_CONSTANT_UI', 'GUN_YAMAZAKI'):
+                mult *= 1.10
+                buffs.append("👁️UIPATH(+10%)")
+            # Beast / Wild paths: +10% when beast instinct is emphasized
+            elif _pname in ('BAEKHO_BEAST', 'ELI_BEAST', 'TOM_LEE_WILD', 'ELI_TOM_LEE'):
+                mult *= 1.10
+                buffs.append("🦁WILD(+10%)")
+            # Conviction / Will paths: +10% when HP < 50% (desperation = conviction)
+            elif _pname in ('JINRANG_CONVICTION', 'JAKE_CONVICTION', 'JAKE_GAPRYONG', 'GAPRYONG_CONVICTION'):
+                if self.max_hp > 0 and self.hp < self.max_hp * 0.50:
+                    mult *= 1.10
+                    buffs.append("👑CONVICTION PATH(+10%)")
+            # Speed / Invisible paths: +10% (precision bonus)
+            elif _pname in ('JAMES_LEE_INVISIBLE', 'JAEGYEON_SPEED', 'SINU_INVISIBLE', 'CHARLES_ELITE',
+                            'GOO_MOONLIGHT', 'GOO_FIFTH', 'JOONGOO_HWARANG',
+                            'DANIEL_COPY'):  # Five Senses = prediction/foresight path
+                mult *= 1.10
+                buffs.append("⚡SPEED PATH(+10%)")
+            # Grapple / Throw paths: +10% bind chance represented as dmg bonus
+            elif _pname in ('VIN_JIN_SSIREUM', 'HAN_JAEHA', 'SEONGJI_MONSTER', 'SEONGJI_MARTIAL'):
+                mult *= 1.10
+                buffs.append("🤼GRAPPLE(+10%)")
+            # CQC / Armed paths: +10%
+            elif _pname in ('WARREN_CQC', 'WARREN_HEART', 'MANAGER_KIM_CQC', 'JOONGOO_ARMED'):
+                mult *= 1.10
+                buffs.append("🔫CQC PATH(+10%)")
+            # Choreography / Dance paths: +10%
+            elif _pname in ('JOHAN_CHOREOGRAPHY', 'BAEK_SEONG_TAEKKYON'):
+                mult *= 1.10
+                buffs.append("💃DANCE(+10%)")
+            # Strength / Brawler paths: +10%
+            elif _pname in ('GAPRYONG_FIST_MEMBER', 'GITAE_KIM', 'TAESOO_MA_FIST',
+                            'MANDEOK_POWER', 'SAMUEL_AMBITION', 'LOGAN_BULLY'):
+                mult *= 1.10
+                buffs.append("💪BRAWLER(+10%)")
+            # Blade / Technical paths: +10%
+            elif _pname in ('JICHANG_HAND_BLADE', 'GONGSEOB_IRON', 'SEOKDU_HEADBUTT',
+                            'ZACK_IRON', 'JAY_KALI', 'WARREN_JKD',
+                            'XIAOLUNG_MUAY_THAI', 'VASCO_SYSTEMA', 'VASCO_MUAY_THAI',
+                            'RYUHEI_YAKUZA', 'KIM_MINJAE_JUDO', 'DETECTIVE_KANG_BOXING',
+                            'PARK_FATHER', 'SHINGEN_YAMAZAKI'):
+                mult *= 1.10
+                buffs.append("⚔️TECHNICAL(+10%)")
+
         # DUAL BODY: body type modifier
         # Perfect Body = natural 1.0x (baseline — elite physical frame)
         # True Body (post-Gun) = 0.85x ATK but +15% damage reduction (handled in take_damage)
@@ -680,24 +778,31 @@ class Character:
             mult *= 1.20
             buffs.append("🔴RIGHTHAND(+20%)")
 
-        # CONVICTION STACKS (Jinrang): each stack = +10% dmg
-        if hasattr(self, 'conviction_stacks') and self.conviction_stacks > 0:
+        # CONVICTION STACKS (Jinrang ONLY): each stack = +10% dmg
+        # Jake Kim also has conviction_stacks but it's for afterimage tracking, NOT dmg bonus.
+        if hasattr(self, 'conviction_stacks') and self.conviction_stacks > 0 and hasattr(self, 'last_stand_available'):
             conv_bonus = 1.0 + (self.conviction_stacks * 0.10)
             mult *= conv_bonus
             buffs.append(f"👑CONVICTION{self.conviction_stacks}(+{self.conviction_stacks*10}%)")
 
-        # HEAT MODE (Vasco): +50% when active
+        # HEAT MODE (Vasco + Zack): +50% when active
         if hasattr(self, 'heat_mode_active') and self.heat_mode_active:
             mult *= 1.50
             buffs.append("🔥HEATMODE(+50%)")
+        # ZACK HEAT MODE (bleeding eyes): same mechanic, different field name
+        if hasattr(self, 'heat_mode') and self.heat_mode:
+            mult *= 1.50
+            buffs.append("🩸BLEEDINGEYES(+50%)")
+
+        # VASCO RUNNER'S HIGH — handled via temp_buff (RunnerHigh 2.0x) already in temp_buff loop
 
         # GLASSES OFF (Vin Jin): +60% when glasses removed
         if hasattr(self, 'glasses_on') and not self.glasses_on:
             mult *= 1.60
             buffs.append("🕶️GLASSESOFF(+60%)")
 
-        # LAST STAND BURST (Jinrang): +70% when last stand conviction activated
-        if hasattr(self, 'last_stand_burst') and self.last_stand_burst:
+        # LAST STAND BURST (Jinrang): +70% when last stand conviction activated AND timer > 0
+        if hasattr(self, 'last_stand_burst') and self.last_stand_burst and getattr(self, 'last_stand_burst_timer', 0) > 0:
             mult *= 1.70
             buffs.append("👑LASTSTAND(+70%)")
 
@@ -755,8 +860,33 @@ class Character:
         # BUG-X12 FIX: only include permanent_ui if the character has it
         if hasattr(self, 'permanent_ui'):
             d['permanent_ui'] = self.permanent_ui
+        # Zack heat_mode state: serialize so triggered status persists through save/load
+        if hasattr(self, 'heat_mode'):
+            d['heat_mode'] = self.heat_mode
+            d['heat_mode_triggered'] = getattr(self, 'heat_mode_triggered', False)
+        # VinJin glasses state
+        if hasattr(self, 'glasses_on'):
+            d['glasses_on'] = self.glasses_on
+        # Seongji monster_mode_active state
+        if hasattr(self, 'monster_mode_active'):
+            d['monster_mode_active'] = self.monster_mode_active
+        # Gun Park Shiro Oni state
+        if hasattr(self, 'uncontrolled_ui_active'):
+            d['uncontrolled_ui_active'] = self.uncontrolled_ui_active
+            d['uncontrolled_ui_triggered'] = getattr(self, 'uncontrolled_ui_triggered', False)
+        # Samuel ambush state
+        if hasattr(self, 'ambush_available'):
+            d['ambush_available'] = self.ambush_available
+        # Jinrang conviction_stacks: persist through save/load
+        if hasattr(self, 'last_stand_available'):
+            d['conviction_stacks']   = getattr(self, 'conviction_stacks', 0)
+            d['last_stand_available'] = self.last_stand_available
+            d['last_stand_burst']     = self.last_stand_burst
+            d['last_stand_burst_timer'] = self.last_stand_burst_timer
         # DUAL BODY: serialize both body pools if this is Daniel
         if hasattr(self, 'active_body'):
+            d['subconsciousness_active'] = getattr(self, 'subconsciousness_active', False)
+            d['five_senses_exhaustion_pending'] = getattr(self, 'five_senses_exhaustion_pending', False)
             d['active_body']        = self.active_body
             d['perfect_hp']         = self.perfect_hp
             d['perfect_max_hp']     = self.perfect_max_hp
@@ -815,6 +945,30 @@ class Character:
         # BUG-X12 FIX: restore permanent_ui if present (GunPark Constant UI)
         if 'permanent_ui' in data and hasattr(self, 'permanent_ui'):
             self.permanent_ui = data['permanent_ui']
+        # Zack heat_mode restore
+        if hasattr(self, 'heat_mode') and 'heat_mode' in data:
+            self.heat_mode = data['heat_mode']
+            self.heat_mode_triggered = data.get('heat_mode_triggered', False)
+        # VinJin glasses restore
+        if hasattr(self, 'glasses_on') and 'glasses_on' in data:
+            self.glasses_on = data['glasses_on']
+        # Seongji monster_mode restore
+        if hasattr(self, 'monster_mode_active') and 'monster_mode_active' in data:
+            self.monster_mode_active = data['monster_mode_active']
+        # Gun Park Shiro Oni restore
+        if hasattr(self, 'uncontrolled_ui_active') and 'uncontrolled_ui_active' in data:
+            self.uncontrolled_ui_active = data['uncontrolled_ui_active']
+            self.uncontrolled_ui_triggered = data.get('uncontrolled_ui_triggered', False)
+        # Samuel ambush restore
+        if hasattr(self, 'ambush_available') and 'ambush_available' in data:
+            self.ambush_available = data['ambush_available']
+        # Jinrang conviction/last_stand restore
+        if hasattr(self, 'last_stand_available') and 'last_stand_available' in data:
+            self.conviction_stacks     = data.get('conviction_stacks', 0)
+            self.last_stand_available  = data['last_stand_available']
+            self.last_stand_burst      = data.get('last_stand_burst', False)
+            self.last_stand_burst_timer = data.get('last_stand_burst_timer', 0)
+
         # DUAL BODY: restore both pools if this is Daniel
         if hasattr(self, 'active_body'):
             self.active_body        = data.get('active_body', 'perfect')
@@ -828,6 +982,8 @@ class Character:
             self.true_max_energy    = data.get('true_max_energy', self.true_max_energy)
             self.dual_sync_active   = data.get('dual_sync_active', False)
             self.dual_sync_timer    = data.get('dual_sync_timer', 0)
+            self.subconsciousness_active = data.get('subconsciousness_active', False)
+            self.five_senses_exhaustion_pending = data.get('five_senses_exhaustion_pending', False)
             # Sync live hp/energy/max_hp/max_energy to the active body's pool
             if self.active_body == 'perfect':
                 self.hp = self.perfect_hp; self.max_hp = self.perfect_max_hp
@@ -911,14 +1067,18 @@ class GapryongKim(Character):
             '4': {"name": "👑 Legend's Legacy", "cost": 50, "dmg": (150, 200), "type": "damage",
                   "desc": "The accumulated power of a legend."},
             '5': {"name": "🛡️ Gapryong's Defense", "cost": 25, "dmg": (0, 0), "type": "utility",
-                  "desc": "Defensive stance. Adds -50% damage reduction buff for 2 turns."}
+                  "desc": "Defensive stance. Adds -50% damage reduction buff for 2 turns."},
+            '6': {"name": "👑 Conviction: To Protect", "cost": 70, "dmg": (180, 240), "type": "damage",
+                  "desc": "CANON: Gapryong's fist is powered by protecting his people. Scales with how many party members are alive — the more people to protect, the stronger. Daniel couldn't copy this without having something to protect."}
         }
 
 
 class TomLee(Character):
     def __init__(self):
         super().__init__("Tom Lee", "The Wild", 850, 380,
-                         [Realm.STRENGTH, Realm.TENACITY])
+                         [Realm.STRENGTH, Realm.SPEED, Realm.TENACITY, Realm.TECHNIQUE])
+        # CANON [WIKI]: "first confirmed holder of four Masteries (Strength, Speed, Durability, Technique)"
+        # Tom Lee stated "in our era, everyone had four"
         self.canon_episode = 0
         self.affiliation = "Gen 0 / Ten Geniuses"
         self.paths_available = [Path.TOM_LEE_WILD, Path.GAPRYONG_FIST_MEMBER]
@@ -973,7 +1133,10 @@ class CharlesChoi(Character):
 
 class JinyoungPark(Character):
     def __init__(self):
-        super().__init__("Jinyoung Park", "The Medical Genius", 780, 350, [Realm.TECHNIQUE])
+        super().__init__("Jinyoung Park", "The Medical Genius", 780, 350,
+                         [Realm.TECHNIQUE, Realm.STRENGTH, Realm.SPEED, Realm.TENACITY])
+        # CANON [W Jinyoung]: "Gen 0 monsters distinguished by possessing all 4 fundamental
+        # thresholds: Strength, Speed, Endurance, Technique" — all 4 confirmed for Gen 0.
         self.canon_episode = 0
         self.paths_available = [Path.JINYOUNG_COPY, Path.GAPRYONG_FIST_MEMBER]
         # MIRROR KING: copies opponent masteries, not just motions — wiki.
@@ -1028,13 +1191,17 @@ class Baekho(Character):
 
 class JamesLee(Character):
     def __init__(self):
-        super().__init__("James Lee", "Legend of 1st Gen", 880, 390, [Realm.SPEED, Realm.TECHNIQUE])
+        super().__init__("James Lee", "Legend of 1st Gen", 880, 390, [Realm.SPEED, Realm.TECHNIQUE, Realm.STRENGTH])
+        # CANON [Transcenders]: 3 Masteries confirmed.
+        # SPEED + TECHNIQUE: confirmed (invisible attacks).
+        # STRENGTH: inferred as third — he dismantled the entire 1st Generation.
         self.canon_episode = 0
         self.affiliation = "1st Generation / Ten Geniuses"
         self.paths_available = [Path.JAMES_LEE_INVISIBLE]
         self.abilities = {
             '1': {"name": "👑 Invisible Kick", "cost": 35, "dmg": (120, 170), "type": "damage",
-                  "desc": "A kick that can't be seen. James Lee's speed transcends human perception."},
+                  "armor_break": True,
+                  "desc": "CANON: James Lee mastered invisible attacks. Speed transcends perception — cannot be blocked or defended against."},
             '2': {"name": "👑 Perfect Form", "cost": 40, "dmg": (140, 190), "type": "damage",
                   "desc": "Technique perfected to its absolute peak. Every movement economical and deadly."},
             '3': {"name": "👑 One Man Circle", "cost": 50, "dmg": (170, 220), "type": "damage",
@@ -1070,7 +1237,8 @@ class GitaeKim(Character):
 
 class JichangKwak(Character):
     def __init__(self):
-        super().__init__("Jichang Kwak", "The White Viper", 800, 360, [Realm.SPEED, Realm.TECHNIQUE])
+        super().__init__("Jichang Kwak", "The White Viper", 800, 360, [Realm.SPEED, Realm.STRENGTH])
+        # CANON [NamuWiki]: "reason he is strong is because he has not only strength but also speed"
         self.canon_episode = 0
         self.paths_available = [Path.JICHANG_HAND_BLADE]
         # BLADE EDGE: Jichang trained hands/forearms to blade sharpness. Canon: TV Tropes.
@@ -1095,7 +1263,9 @@ class JichangKwak(Character):
 
 class TaesooMa(Character):
     def __init__(self):
-        super().__init__("Taesoo Ma", "King of Ansan", 820, 350, [Realm.STRENGTH])
+        super().__init__("Taesoo Ma", "King of Ansan", 820, 350, [Realm.STRENGTH, Realm.SPEED])
+        # CANON [Unique Skill wiki]: Ultimate Fist "uses Strength Mastery to gather all strength,
+        # then uses both Strength and Speed Mastery to hit" — SPEED confirmed
         self.canon_episode = 0
         self.paths_available = [Path.TAESOO_MA_FIST]
         self.affiliation = "1st Generation"
@@ -1120,7 +1290,9 @@ class TaesooMa(Character):
 
 class GongseobJi(Character):
     def __init__(self):
-        super().__init__("Gongseob Ji", "King of Daegu", 750, 340, [Realm.SPEED, Realm.TENACITY])
+        super().__init__("Gongseob Ji", "King of Daegu", 750, 340, [Realm.SPEED, Realm.TENACITY, Realm.TECHNIQUE])
+        # CANON [Transcenders]: 3 Masteries confirmed. SPEED + TENACITY known.
+        # TECHNIQUE: "One Step One Kill" uses Speed AND Technique Mastery [Unique Skill wiki].
         self.canon_episode = 0
         self.affiliation = "1st Generation"
         self.paths_available = [Path.GONGSEOB_IRON]
@@ -1136,7 +1308,8 @@ class GongseobJi(Character):
             '3': {"name": "🩷 Tungsten Defense", "cost": 20, "dmg": (0, 0), "type": "utility",
                   "desc": "Endurance mastery: -70% damage for 1 turn (active version of passive nullification)."},
             '4': {"name": "🩷 One Step, One Kill", "cost": 50, "dmg": (140, 190), "type": "counter",
-                  "desc": "UNIQUE SKILL (canon). Speed Mastery dodge + critical counter in ONE step. Counters next attack. Technique+Speed mastery combined."}
+                  "uncopyable": True,
+                  "desc": "CANON UNIQUE SKILL. Speed+Technique mastery in ONE step — dodge and counter simultaneously. Copy technique wiki: Daniel cannot copy Gongseob's DOMAIN of One Step."}
         }
 
 
@@ -1165,7 +1338,10 @@ class SeokduWang(Character):
 
 class JaegyeonNa(Character):
     def __init__(self):
-        super().__init__("Jaegyeon Na", "King of Incheon", 770, 360, [Realm.SPEED])
+        super().__init__("Jaegyeon Na", "King of Incheon", 770, 360, [Realm.SPEED, Realm.TECHNIQUE, Realm.STRENGTH])
+        # CANON [Transcenders]: 3 Masteries confirmed.
+        # SPEED: confirmed (invisible attacks, almost caught James Lee).
+        # TECHNIQUE + STRENGTH: inferred from 3-count and 1st Gen King tier.
         self.canon_episode = 544
         self.paths_available = [Path.JAEGYEON_SPEED]
         self.affiliation = "1st Generation"
@@ -1191,11 +1367,14 @@ class JaegyeonNa(Character):
 class SeongjiYuk(Character):
     def __init__(self):
         super().__init__("Seongji Yuk", "King of Cheonliang", 820, 370,
-                         [Realm.STRENGTH, Realm.TECHNIQUE, Realm.OVERCOMING])
+                         [Realm.STRENGTH, Realm.TECHNIQUE, Realm.SPEED])
+        # CANON [Mastery wiki]: "Seongji Yuk tapped into Speed Mastery because he believed in
+        # and pushed his physical abilities" — 3 confirmed: STRENGTH, TECHNIQUE, SPEED
         self.canon_episode = 500
         self.paths_available = [Path.SEONGJI_MONSTER, Path.SEONGJI_MARTIAL]
         # RIB CRUSH DEBUFF: each Mujin Ssireum use reduces target max_hp by 8%.
         self.rib_crush_count = {}  # enemy_name -> count
+        self.monster_mode_active = False  # set by activate_monster_mode
         self.abilities = {
             '1': {"name": "🇰🇷 Ssireum: Throw", "cost": 25, "dmg": (90, 140), "type": "damage",
                   "desc": "Jin Mujin's Ssireum — wrestling that breaks bones with pure grip strength."},
@@ -1208,11 +1387,12 @@ class SeongjiYuk(Character):
         }
 
     def activate_monster_mode(self):
-        self.beast_mode = True
-        self.beast_timer = 3
-        # Add enemy ATK debuff via temp_buff on self (used as debuff signal in enemy_turn)
+        # Use temp_buff for the full +80% rather than beast_mode (which only gives +60%)
         self.monster_mode_active = True
-        return "🦍🦍🦍 MONSTER MODE! Seongji Yuk transforms! +80% damage for 3 turns! Enemy ATK -20%!"
+        self.beast_timer = 3   # reuse timer field for duration tracking
+        # Apply a temp_buff of 1.80x dmg for 3 turns
+        self.temp_buffs.append({'name': 'MonsterMode', 'dmg_mult': 1.80, 'def_mult': 1.0, 'turns': 3})
+        return "🦍🦍🦍 MONSTER MODE! Seongji Yuk transforms! Feral state — +80% damage for 3 turns! Enemies hesitate — ATK -20%!"
 
 
 class Jinrang(Character):
@@ -1259,7 +1439,11 @@ class DanielPark(Character):
         self.gapryong_copied = True
         self.form = "Normal"
         self.switch_available = True
-        self.paths_available = [Path.DANIEL_UI, Path.DANIEL_COPY]
+        # CANON PATH SPLIT:
+        # DANIEL_COPY (now 'Five Senses Path') = TRUE BODY's path — prediction, senses, foresight
+        # DANIEL_UI = PERFECT BODY's path — Ultra Instinct (Yamazaki bloodline)
+        # A player can choose either path, but each is canonically tied to a specific body.
+        self.paths_available = [Path.DANIEL_COPY, Path.DANIEL_UI]
 
         # ── DUAL BODY SYSTEM ─────────────────────────────────────────────────
         # Daniel has two separate bodies. active_body = "perfect" or "true".
@@ -1282,8 +1466,12 @@ class DanielPark(Character):
         self.true_max_energy    = 260
 
         # Dual Body Sync state — both bodies fight simultaneously
-        self.dual_sync_active   = False
-        self.dual_sync_timer    = 0     # turns remaining
+        self.dual_sync_active      = False
+        self.dual_sync_timer       = 0     # turns remaining
+        # Subconsciousness state (True Body UI — uncontrolled, 30% friendly fire)
+        self.subconsciousness_active = False
+        # Five Senses exhaustion pending (set when True Body uses Five Senses path)
+        self.five_senses_exhaustion_pending = False
         # ─────────────────────────────────────────────────────────────────────
 
         self.abilities = {
@@ -1308,9 +1496,26 @@ class DanielPark(Character):
             '10': {"name": "🩷 Jichang's Hand Blade", "cost": 45, "dmg": (90, 130), "type": "damage",
                    "desc": "Jichang Kwak's legendary technique."},
             '11': {"name": "👑 Gapryong's Conviction", "cost": 60, "dmg": (120, 180), "type": "damage",
-                   "desc": "The ultimate instinctive response — Daniel's body channels Gapryong's fist."},
+                   "armor_break": True,
+                   "desc": "CANON: Gun taught Daniel Yamazaki Kyokushin Karate. A punch powered by the desire to protect — cannot be copied without something to protect. Used in Gapryong style."},
             '12': {"name": "👁️ Ultra Instinct", "cost": 100, "dmg": (0, 0), "type": "ui",
-                   "desc": "Daniel's ultimate awakening. Body moves before mind. +150% damage for 3 turns."},
+                   "desc": "PERFECT BODY CANON: Full UI — 2.5x dmg, 3 turns, heals 50HP. Unconscious max potential. "
+                           "TRUE BODY (emergency only): Subconsciousness — 1.5x effective dmg, 2 turns, 30% friendly fire. "
+                           "NOTE: True Body's PATH is Five Senses (ability 15), not UI."},
+            '15': {"name": "👁️ Five Senses Path: Prediction", "cost": 55, "dmg": (0, 0), "type": "five_senses",
+                   "desc": "CANON: TRUE BODY'S UNIQUE PATH. Combines copying + maximized five senses. "
+                           "Predicts opponent's attack AND defense paths simultaneously. "
+                           "Gun: 'If he can foresee attacks, he can also foresee defensive maneuvers — he will be without equals.' "
+                           "Pacheon Jo: 'Not dodging — FORESEEING ALL my moves.' "
+                           "DOWNSIDE: extreme brain stress — Daniel is exhausted after use (1 turn penalty). "
+                           "Effects: -50% dmg taken + +30% dmg dealt for 3 turns. Best on True Body."},
+            '16': {"name": "🩷 Gongseob's One Step, One Kill", "cost": 50, "dmg": (140, 190), "type": "counter",
+                   "armor_break": True,
+                   "desc": "CANON (VS Battles): Daniel learned One Step One Kill. Devastating counterpunch from any angle. Cannot copy Gongseob's DOMAIN, but can copy the motion."},
+            '17': {"name": "🔥 True Body: Heat Mode Strike", "cost": 50, "dmg": (120, 170), "type": "damage",
+                   "desc": "CANON: True Body's signature power-up. Self-hatred → Heat Mode → Kyokushin Karate. "
+                           "Best used on True Body. Scales with self-hatred emotion. NOT the same as UI — "
+                           "this is an emotional amplifier, not an unconscious state."},
             '13': {"name": "🔁 Body Swap", "cost": 40, "dmg": (0, 0), "type": "body_swap",
                    "desc": "Daniel shifts his consciousness to his other body. Swaps HP/energy pools. "
                            "Perfect Body: high ATK, 320HP. True Body: tank, 380HP, lower ATK."},
@@ -1321,17 +1526,40 @@ class DanielPark(Character):
         }
 
     def activate_ui(self):
-        self.ui_mode = True
-        self.ui_timer = 3
-        self.form = "ULTRA INSTINCT"
-        self.heal(50)
-        body_tag = "PERFECT BODY" if self.active_body == "perfect" else "TRUE BODY"
-        return f"👁️👁️👁️ ULTRA INSTINCT [{body_tag}]! Eyes go black — reversed pupils! Body moves on pure instinct!"
+        """
+        CANON:
+        PERFECT BODY = Ultra Instinct (innate Yamazaki-adjacent). 2.5x, 3 turns, heals 50.
+        TRUE BODY = Does NOT have natural UI. Its PATH is Five Senses (prediction).
+                    Emergency Subconsciousness (Gun-taught) = 1.5x effective, 2 turns, 30% friendly fire.
+        """
+        if self.active_body == 'perfect':
+            self.ui_mode = True
+            self.ui_timer = 3
+            self.form = "ULTRA INSTINCT — PERFECT BODY"
+            self.heal(50)
+            return ("👁️👁️👁️ ULTRA INSTINCT [PERFECT BODY]! "
+                    "Eyes go black — reversed pupils! "
+                    "Body matches opponent's power exactly — surpasses Johan in this state! "
+                    "Heals 50HP. 2.5x damage for 3 turns!")
+        else:
+            # TRUE BODY emergency Subconsciousness (not its normal path — Five Senses is)
+            self.ui_mode = True
+            self.ui_timer = 2
+            self.form = "SUBCONSCIOUSNESS — EMERGENCY (TRUE BODY)"
+            self.subconsciousness_active = True
+            self.heal(20)
+            return ("⚠️ EMERGENCY SUBCONSCIOUSNESS [TRUE BODY]! "
+                    "Gun's choking technique activated in desperation. "
+                    "True Body's PATH is Five Senses, NOT UI — this is uncontrolled emergency mode! "
+                    "30% friendly fire risk! 1.5x (reduced) damage for 2 turns.")
 
 
 class ZackLee(Character):
     def __init__(self):
-        super().__init__("Zack Lee", "The Iron Boxer", 380, 280, [])
+        super().__init__("Zack Lee", "The Iron Boxer", 380, 280, [Realm.SPEED, Realm.TENACITY])
+        # CANON [Transcenders wiki]: 2 Masteries confirmed.
+        # SPEED: boxing training focus [fan source confirmed].
+        # TENACITY/ENDURANCE: Gongseob Ji training — "deal with and dish out heavy damage".
         self.canon_episode = 1
         self.paths_available = [Path.ZACK_IRON]
         self.affiliation = "J High"
@@ -1362,8 +1590,10 @@ class ZackLee(Character):
 
 class JohanSeong(Character):
     def __init__(self, blind=True):
+        # CANON: Johan has TECHNIQUE + OVERCOMING confirmed. SPEED is NOT confirmed on wiki.
+        # Removed SPEED realm based on lookism.fandom.com/wiki/Johan_Seong
         super().__init__("Johan Seong", "The God Eye", 400, 300,
-                         [Realm.TECHNIQUE, Realm.SPEED, Realm.OVERCOMING])
+                         [Realm.TECHNIQUE, Realm.OVERCOMING])
         self.canon_episode = 55
         self.affiliation = "God Dog"
         self.blind = blind
@@ -1393,16 +1623,24 @@ class JohanSeong(Character):
                   "desc": "Johan's original style born from K-Pop choreography. A deadly dance."},
             '8': {"name": "💃 Choreography: Perfected", "cost": 45, "dmg": (95, 140), "type": "damage",
                   "desc": "The ultimate expression of his dance combat."},
-            '9': {"name": "👁️ God Eye Activation", "cost": 30, "dmg": (0, 0), "type": "buff",
-                  "desc": "Activates God Eye for 5 turns. +30% copy chance. Johan senses via vibration."},
+            '8': {"name": "💃 Infinite Strike", "cost": 50, "dmg": (100, 150), "type": "damage",
+                  "armor_break": True,
+                  "desc": "CANON PATH: Johan's Infinite Technique / Strike Arc of Infinity. A single strike with numerous arcs, always hits target. Gun Park: 'His attacks are a collection of various moves — a simple kick contains numerous strike arcs.'"},
+            '9': {"name": "👁️ God Eye: Copy Integration", "cost": 30, "dmg": (0, 0), "type": "buff",
+                  "desc": "CANON: Johan integrates all copied fighting styles into unpredictable multi-arc attacks. +30% dmg for 5 turns, 25% armor_break chance on all attacks. Other senses compensate for blindness."},
+            'C': {"name": "🔫 CQC: Copied from Manager Kim", "cost": 60, "dmg": (120, 160), "type": "damage",
+                  "armor_break": True,
+                  "desc": "CANON: Johan copied CQC from Manager Kim — normally uncopyable. Targets internal organs directly, bypasses all defense."},
+            'U': {"name": "👁️ UI Copy: Daniel's Physique", "cost": 120, "dmg": (0, 0), "type": "ui",
+                  "desc": "CANON (VS Battles): Johan copies Daniel's UI body — fires all muscles and nerves simultaneously. Achieves UI Daniel's physical status. Only sustainable for 10 seconds / 2 turns in battle."},
             # MECH-7 FIX: Veinous Rage wired to Johan as his extreme-will ability
             'V': {"name": "👁️ Veinous Rage", "cost": 50, "dmg": (0, 0), "type": "buff",
-                  "desc": "Johan pushes past his limits. Veins pulse visibly. +80% damage for 3 turns."},
+                  "desc": "CANON: Johan becomes even more powerful when furious. Veins pulse visibly. +80% damage for 3 turns."},
         }
         if blind:
             self.abilities['P'] = {
                 "name": "🕶️ Blindness (Overcoming)", "cost": 0, "dmg": (0, 0), "type": "passive",
-                "desc": "Johan fights despite blindness. Other senses sharpen. +30% damage from overcoming."
+                "desc": "CANON: Johan is going blind like his mother. His other senses sharpen to compensate. Overcoming realm: fighting through disability makes him stronger."
             }
             self.title = "The Blind God Eye"
 
@@ -1410,7 +1648,16 @@ class JohanSeong(Character):
         self.god_eye_active = True
         self.god_eye_timer = 5
         self.form = "GOD EYE AWAKENED"
-        return "👁️👁️👁️ GOD EYE ACTIVATED for 5 turns! +30% copy chance!"
+        return "👁️👁️👁️ GOD EYE: COPY INTEGRATION ACTIVE! All copied styles merge into multi-arc attacks! +30% dmg, 25% armor_break chance for 5 turns!"
+
+    def activate_ui(self):
+        """Johan copies Daniel's UI body — fires all muscles and nerves simultaneously.
+        CANON: achieves UI Daniel's physical status. Only lasts 10 seconds / 2 turns."""
+        self.ui_mode = True
+        self.ui_timer = 2   # Canon: only 10 seconds, shorter than Daniel's 3 turns
+        self.form = "UI COPY — DANIEL'S PHYSIQUE"
+        self.heal(30)
+        return "👁️👁️👁️ JOHAN: UI COPY ACTIVE! Fires all muscles and nerves simultaneously! Copies Daniel's UI physique for 2 turns! +150% damage!"
 
     def copy_technique(self, enemy_technique, target=None):
         if enemy_technique in self.technique_view_count:
@@ -1612,7 +1859,9 @@ class Vasco(Character):
             '4': {"name": "👊 Sunken Fist", "cost": 30, "dmg": (70, 100), "type": "damage",
                   "desc": "The fist that sank ships."},
             '5': {"name": "🔥 Hero's Resolve", "cost": 35, "dmg": (0, 0), "type": "buff",
-                  "desc": "Vasco's burning heart. +40% dmg for 3 turns. Heals Vasco +25HP (passion overcomes injury)."}
+                  "desc": "Vasco's burning heart. +40% dmg for 3 turns. Heals Vasco +25HP (passion overcomes injury)."},
+            '6': {"name": "👁️ Runner's High", "cost": 80, "dmg": (0, 0), "type": "buff",
+                  "desc": "CANON: Brekdak's 1st Forbidden Move — his STRONGEST. Lower number = more powerful. Eyes go pale white. ALL physical aspects doubled (speed, destructive power, etc). Sanity maintained, unlike other users of similar techniques. x2.0 dmg for 2 turns."}
         }
 
 
@@ -1688,7 +1937,8 @@ class WarrenChae(Character):
 
 class JakeKim(Character):
     def __init__(self):
-        super().__init__("Jake Kim", "The Conviction", 430, 270, [Realm.OVERCOMING])
+        super().__init__("Jake Kim", "The Conviction", 430, 270, [Realm.OVERCOMING, Realm.TENACITY])
+        # CANON [WIKI]: "demonstrated Endurance Mastery" in Hunt for Gan arc.
         self.canon_episode = 200
         self.affiliation = "Big Deal"
         self.paths_available = [Path.JAKE_CONVICTION, Path.JAKE_GAPRYONG]
@@ -1696,15 +1946,22 @@ class JakeKim(Character):
         # At max stacks: leaves afterimages, +20% evasion bonus.
         self.conviction_stacks = 0
         self.max_conviction_stacks = 5
+        # CANON Ch.469: Jake unlocked Innate Strength (same as Gitae Kim) + completed Stage of Mastery.
+        # His bloodline ability cannot be copied — raw Gapryong genetics.
+        self.innate_strength = True
         self.abilities = {
             '1': {"name": "⚖️ Conviction Punch", "cost": 25, "dmg": (60, 85), "type": "damage",
-                  "desc": "A punch backed by pure conviction."},
+                  "desc": "A punch backed by pure conviction. MMA-based fighting style."},
             '2': {"name": "👑 Inherited Will", "cost": 50, "dmg": (95, 140), "type": "damage",
-                  "desc": "The will of Gapryong flows through his son."},
+                  "innate": True,
+                  "desc": "CANON Ch.469: Gapryong's blood fully activated — Innate Strength + Stage of Mastery. 25% armor_break chance."},
             '3': {"name": "👑 Gapryong's Blood", "cost": 70, "dmg": (120, 180), "type": "damage",
-                  "desc": "Bloodline potential awakened."},
+                  "innate": True,
+                  "desc": "CANON: raw Gapryong genetics — cannot be copied. Jake predicted Sinu Han's invisible attacks (only his father can normally do this). 25% armor_break chance."},
             '4': {"name": "⚖️ Conviction Mode", "cost": 45, "dmg": (0, 0), "type": "buff",
-                  "desc": "State of pure conviction. +50% damage for 3 turns."}
+                  "desc": "State of pure conviction. +50% damage for 3 turns."},
+            '5': {"name": "💜 Conviction Effect: Aura", "cost": 55, "dmg": (100, 150), "type": "damage",
+                  "desc": "CANON: Jake's unknown purple aura — Conviction Effect. Deals serious damage even to opponents who can detach from pain (like Gan). Uncopyable essence of Gapryong's will."}
         }
 
 
@@ -1716,70 +1973,84 @@ class GunPark(Character):
         self.affiliation = "Ten Geniuses / Yamazaki Syndicate"
         self.paths_available = [Path.GUN_YAMAZAKI, Path.GUN_CONSTANT_UI]
         self.permanent_ui = True
+        self.uncontrolled_ui_active = False      # Shiro Oni — Yamazaki true form
+        self.uncontrolled_ui_triggered = False   # once per battle
         self.abilities = {
             '1': {"name": "🥋 Taekwondo: Roundhouse", "cost": 20, "dmg": (65, 90), "type": "damage",
-                  "desc": "Gun's Taekwondo mastery."},
+                  "desc": "Gun's Taekwondo mastery — clean Yamazaki-style execution."},
             '2': {"name": "🥋 Kyokushin: Straight", "cost": 25, "dmg": (70, 100), "type": "damage",
-                  "desc": "The straight punch of Kyokushin Karate."},
+                  "desc": "CANON: Yamazaki-Style Kyokushin Karate. Gun's primary fighting style."},
             '3': {"name": "🖤 Black Bone", "cost": 70, "dmg": (130, 200), "type": "damage",
-                  "desc": "The legendary Yamazaki technique."},
-            '4': {"name": "👁️ Constant UI [PASSIVE — always +30%]", "cost": 0, "dmg": (0, 0), "type": "passive",
-                  "desc": "Gun exists in perpetual Ultra Instinct. Always active: +30% to all damage."}
+                  "armor_break": True,
+                  "desc": "CANON: The Black Bone technique — Yamazaki heritage. Dura-negating strike. Gun passed this to Daniel."},
+            '4': {"name": "👁️ Constant UI [PASSIVE — always +70%]", "cost": 0, "dmg": (0, 0), "type": "passive",
+                  "desc": "CANON: Gun born with Yamazaki Congenital UI. Always conscious within it. +70% to all damage — Yamazaki UI surpasses Daniel's."},
+            '5': {"name": "⚫ Shiro Oni: Uncontrolled UI", "cost": 90, "dmg": (0, 0), "type": "buff",
+                  "desc": "CANON Ch.529: Yamazaki true form fully unleashed — White Ghost. Triggered when something precious is lost. x2.0 extra dmg for 3 turns. Several times stronger than normal Yamazaki UI."}
         }
 
     def get_damage_multiplier(self):
         mult, buffs = super().get_damage_multiplier()
         if self.permanent_ui:
-            mult *= 1.3
-            buffs.append("👁️ CONSTANT UI")
+            # CANON: Yamazaki Congenital UI — always conscious, always maximizing.
+            # Gun is stronger than Daniel in his base Yamazaki UI form (Ch.529: "several times stronger").
+            # +70% constant represents always-on Yamazaki UI awareness advantage.
+            mult *= 1.70
+            buffs.append("👁️ YAMAZAKI UI(+70%)")
+        if getattr(self, 'uncontrolled_ui_active', False):
+            # CANON Ch.529: Shiro Oni form — Yamazaki UI fully unleashed.
+            # Triggered when something precious is lost. "Several times stronger" than normal.
+            mult *= 2.0
+            buffs.append("⚫ SHIRO ONI(x2.0)")
         return mult, buffs
 
 
 class GooKim(Character):
     def __init__(self):
-        super().__init__("Goo Kim", "The Moonlight Sword", 480, 300, [Realm.TECHNIQUE, Realm.SPEED])
+        # CANON: Goo Kim = Kim Jun-gu (김준구). Same character — merged.
+        # "The Moonlight Sword" / "The Hwarang Sword" / "Weapon Genius"
+        # One of the Ten Geniuses. Charles Choi's bodyguard. Gun Park's closest partner.
+        # Uses Moonlight Sword (50 techniques), Hwarang Sword, AND improvised weapons.
+        super().__init__("Goo Kim", "The Weapon Genius", 520, 300, [Realm.TECHNIQUE, Realm.SPEED])
         self.canon_episode = 300
-        self.affiliation = "Ten Geniuses / 1.5 Generation"
-        self.paths_available = [Path.GOO_MOONLIGHT, Path.GOO_FIFTH]
+        self.affiliation = "Ten Geniuses / HNH Group"
+        self.paths_available = [Path.GOO_MOONLIGHT, Path.GOO_FIFTH, Path.JOONGOO_HWARANG, Path.JOONGOO_ARMED]
         self.abilities = {
-            '1': {"name": "🖊️ Pen Sword", "cost": 15, "dmg": (45, 70), "type": "damage",
-                  "desc": "Goo's signature — even a pen becomes lethal in his hands."},
-            '2': {"name": "🌙 First Sword: Early Moon", "cost": 30, "dmg": (75, 105), "type": "damage",
-                  "desc": "Rising crescent slash."},
-            '3': {"name": "🌓 Second Sword: Crescent Moon", "cost": 35, "dmg": (80, 115), "type": "damage",
-                  "desc": "Sweeping horizontal slash."},
-            '4': {"name": "🌕 Third Sword: Full Moon", "cost": 45, "dmg": (100, 145), "type": "damage",
-                  "desc": "Complete circular motion striking from all directions."},
-            '5': {"name": "🌑 Zero Sword: Lunar Eclipse", "cost": 60, "dmg": (130, 190), "type": "counter",
-                  "desc": "Ultimate counter. Perfect stillness, then strikes."},
-            '6': {"name": "✨ Fifth Sword", "cost": 90, "dmg": (170, 250), "type": "damage",
-                  "desc": "The legendary fifth sword. A technique that shouldn't exist."}
-        }
-
-
-class KimJungu(Character):
-    def __init__(self):
-        super().__init__("Kim Jun-gu", "The Hwarang Sword", 520, 290, [Realm.TECHNIQUE, Realm.SPEED])
-        self.canon_episode = 500
-        self.affiliation = "Independent"
-        self.paths_available = [Path.JOONGOO_HWARANG, Path.JOONGOO_ARMED]
-        # PEN AS SWORD: precision vital-point targeting. Pen Pierce = always armor_break.
-        self.abilities = {
-            '1': {"name": "🖊️ Pen Pierce", "cost": 25, "dmg": (70, 100), "type": "damage",
+            # ── UNARMED / IMPROVISED ──────────────────────────────────────────
+            '1': {"name": "🖊️ Pen Pierce", "cost": 20, "dmg": (65, 95), "type": "damage",
                   "armor_break": True, "vital_strike": True,
-                  "desc": "CANON: precision vital-point targeting — even a pen is lethal. Always armor_break."},
-            '2': {"name": "🔗 Chain Whip", "cost": 30, "dmg": (75, 110), "type": "damage",
-                  "desc": "Flexible chain weapon. Unpredictable reach."},
-            '3': {"name": "⚔️ Hwarang Sword", "cost": 60, "dmg": (140, 210), "type": "damage",
+                  "desc": "CANON: anything in Goo's hand becomes a sword. Pen targets vital points — always armor_break."},
+            '2': {"name": "🔗 Chain Whip", "cost": 25, "dmg": (70, 105), "type": "damage",
+                  "desc": "CANON: chain and bicycle wheels used as improvised swords. Unpredictable reach."},
+            # ── MOONLIGHT SWORD STYLE ─────────────────────────────────────────
+            '3': {"name": "🌙 First Sword: Early Moon", "cost": 30, "dmg": (80, 115), "type": "damage",
                   "armor_break": True,
-                  "desc": "Ancient Hwarang sword technique — targets vital arteries."},
-            '4': {"name": "⚔️ Hwarang: Blade Dance", "cost": 70, "dmg": (160, 240), "type": "damage",
+                  "desc": "CANON (VS Battles): Iaijutsu-like stance — dashes forward at blinding speed to stab/decapitate faster than the opponent can react. Like 'lightning striking the air.'"},
+            '4': {"name": "🌓 Second Sword: Late Crescent Moon", "cost": 35, "dmg": (90, 130), "type": "damage",
                   "armor_break": True,
-                  "desc": "Ultimate Hwarang technique — relentless vital-point assault."},
-            '5': {"name": "🖊️ Vital Point: Bleeding", "cost": 45, "dmg": (90, 130), "type": "debilitate",
+                  "desc": "CANON: dozens of sword slashes released with incredible power simultaneously."},
+            '5': {"name": "🌕 Third Sword: Full Moon", "cost": 45, "dmg": (110, 160), "type": "damage",
+                  "armor_break": True,
+                  "desc": "CANON: thousands of attacks, range of tens of meters — covers a room with thousands of slashes. Each contains greater killing power."},
+            '6': {"name": "🌑 Zero Sword: Lunar Eclipse", "cost": 60, "dmg": (140, 200), "type": "counter",
+                  "armor_break": True,
+                  "desc": "CANON (VS Battles): intentionally lets opponent aim for the back — then SELF-STABS through his own body to impale the opponent simultaneously. Avoids own vitals, hits opponent's heart."},
+            '7': {"name": "✨ Fifth Sword", "cost": 90, "dmg": (180, 260), "type": "damage",
+                  "armor_break": True,
+                  "desc": "CANON Ch.579: Goo created 50 new techniques in ONE HOUR — a feat masters gave up trying. The 5th sword breaks trajectory rules other swordsmen considered impossible. Pacheonjo was in disbelief."},
+            # ── HWARANG SWORD ─────────────────────────────────────────────────
+            '8': {"name": "⚔️ Hwarang: Blade Dance", "cost": 70, "dmg": (165, 245), "type": "damage",
+                  "armor_break": True,
+                  "desc": "CANON: Hwarang sword style — used alongside Moonlight techniques. Relentless vital-point assault."},
+            # ── SPECIAL ───────────────────────────────────────────────────────
+            '9': {"name": "🖊️ Vital Point: Bleeding", "cost": 40, "dmg": (95, 135), "type": "debilitate",
                   "armor_break": True,
                   "desc": "Targets nerve clusters and artery pressure points. Enemy takes +20% dmg for 2 turns."}
         }
+
+
+# NOTE: KimJungu class removed — Goo Kim and Kim Jun-gu are the SAME character (김준구).
+# All KimJungu abilities/paths merged into GooKim above.
 
 
 class ManagerKim(Character):
@@ -1968,17 +2239,20 @@ class VinJin(Character):
         self.paths_available = [Path.VIN_JIN_SSIREUM]
         # GLASSES OFF: removing sunglasses signals power escalation.
         # When glasses off: +60% dmg. Kani Basami causes bind. Mujin can uproot trees.
-        # CBR: "after training and skipping the glasses, Vin Jin became one of the strongest of Gen 2."
+        # CANON [WIKI]: Innate Strength confirmed — "only Vin Jin and Jake Kim so far"
+        # Eyes glow purple, strength grows exponentially.
         self.glasses_on = True
+        self.innate_strength = True   # CANON [WIKI] confirmed
         self.abilities = {
             '1': {"name": "🥋 Judo: Kani Basami",     "cost": 25, "dmg": (70, 110), "type": "damage",
                   "bind_chance": 0.40,
                   "desc": "CANON: forbidden scissors throw. 40% bind — legs locked around opponent, immobilized."},
             '2': {"name": "🥋 Kudo: Bone Crusher",   "cost": 25, "dmg": (70, 110), "type": "damage",
-                  "desc": "Kudo: superhuman grip strength crushes bones. Immense raw power."},
+                  "innate": True,
+                  "desc": "CANON [WIKI]: Innate Strength — grip strength far beyond Strength Mastery. Eyes glow purple. 25% armor_break chance."},
             '3': {"name": "🇰🇷 Mujin Ssireum",        "cost": 35, "dmg": (95, 140), "type": "damage",
-                  "bind_chance": 0.50,
-                  "desc": "Bone-breaking grip — uproots full-grown trees. 50% bind chance."},
+                  "bind_chance": 0.50, "innate": True,
+                  "desc": "CANON: Innate Strength grip — uproots full-grown trees. 50% bind + 25% armor_break."},
             '4': {"name": "🕶️ Glasses Off: Frenzy",  "cost": 40, "dmg": (110, 155), "type": "damage",
                   "desc": "Without sunglasses: restraint gone. Wild, savage striking."},
             '5': {"name": "🕶️ Sunglasses Off",        "cost": 55, "dmg": (0, 0), "type": "buff",
@@ -2421,7 +2695,7 @@ def create_enemy_kim_jungu_enemy():
         '2': {"name": "Hwarang Sword",    "dmg": (140, 210), "cost": 60, "desc": "Ancient Hwarang technique."},
         '3': {"name": "Blade Dance",      "dmg": (160, 240), "cost": 70, "desc": "Ultimate blade dance."}
     }
-    e = Enemy("Kim Jun-gu", "The Hwarang Sword", 520, 290, abilities, 4, "Independent")
+    e = Enemy("Goo Kim (Armed)", "The Weapon Genius", 520, 290, abilities, 4, "Ten Geniuses / HNH Group")
     e.ai_pattern = ['3', '2', '1']
     return e
 
@@ -2535,7 +2809,7 @@ class LookismGame:
         self.jake       = JakeKim()
         self.gun        = GunPark()
         self.goo        = GooKim()
-        self.joongoo    = KimJungu()
+        # NOTE: KimJungu removed — same character as GooKim (merged)
         self.manager_kim = ManagerKim()
 
         self.gapryong   = GapryongKim()
@@ -2637,8 +2911,7 @@ class LookismGame:
             self.shingen, self.park_father,
             self.kim_minjae, self.detective_kang,
             self.daniel, self.zack, self.johan, self.vasco, self.jay,
-            self.eli, self.warren, self.jake, self.gun, self.goo,
-            self.joongoo
+            self.eli, self.warren, self.jake, self.gun, self.goo
         ]
 
     def add_log(self, message):
@@ -2815,6 +3088,20 @@ class LookismGame:
                 time.sleep(0.8)
                 return
 
+        # CHARLES ANALYTICAL DODGE: 20% passive dodge from reading enemy patterns
+        if hasattr(t, 'analytical_dodge') and random.random() < t.analytical_dodge:
+            self.add_log(f"🎭 {t.name} ANALYTICALLY DODGES! Reads the attack pattern before it lands!")
+            time.sleep(0.4)
+            return
+
+        # WARREN CQC REDIRECT: 25% chance to redirect attack back at attacker
+        if hasattr(t, 'cqc_redirect_chance') and random.random() < t.cqc_redirect_chance:
+            redirect_dmg = int(base_dmg * 0.60)
+            enemy.take_damage(redirect_dmg)
+            self.add_log(f"🔫 {t.name} CQC REDIRECT! Turns {enemy.name}'s attack against them! {redirect_dmg} reflected!")
+            time.sleep(0.4)
+            return
+
         # BUG-V5 FIX: handle utility-type enemy abilities (e.g. Silver Yarn bind)
         # Utility abilities deal their listed damage AND apply their special effect.
         if abil.get("type") == "utility" and "Silver Yarn" in abil.get("name", ""):
@@ -2864,12 +3151,18 @@ class LookismGame:
     # BUG-A FIX: realm_timer decremented after use, so timer > 0 in combat is safe
     # BUG-H: timer starts at 6, so first cleanup brings it to 5 effective turns
     # -------------------------------------------------------------------------
+        # SEONGJI MONSTER MODE: enemies hesitate — -20% ATK while active
+        if any(hasattr(c, 'monster_mode_active') and c.monster_mode_active for c in self.party):
+            for _e in self.enemies:
+                if _e.is_alive() and not any(b['name'] == 'MonsterFear' for b in _e.temp_buffs):
+                    _e.temp_buffs.append({'name': 'MonsterFear', 'dmg_mult': 0.80, 'def_mult': 1.0, 'turns': 1})
+
         # Post-enemy-attack passive mechanics: check all living party members
         for _pchar in self.party:
             if not _pchar.is_alive():
                 continue
-            # CONVICTION STACKS (Jinrang): builds with HP loss
-            if hasattr(_pchar, 'conviction_stacks') and _pchar.max_hp > 0:
+            # CONVICTION STACKS (Jinrang ONLY — has last_stand_available): builds with HP loss
+            if hasattr(_pchar, 'conviction_stacks') and hasattr(_pchar, 'last_stand_available') and _pchar.max_hp > 0:
                 hp_frac = _pchar.hp / _pchar.max_hp
                 if hp_frac < 0.80 and _pchar.conviction_stacks < _pchar.max_conviction_stacks:
                     _pchar.conviction_stacks = min(_pchar.max_conviction_stacks, _pchar.conviction_stacks + 1)
@@ -2881,12 +3174,20 @@ class LookismGame:
                     _pchar.heat_mode_triggered = True
                     _pchar.temp_buffs.append({'name': 'HeatMode', 'dmg_mult': 1.50, 'def_mult': 1.0, 'turns': 3})
                     self.add_log(f"🔥🔥🔥 {_pchar.name}'s HEAT MODE activates! +50% dmg for 3 turns!")
+            # ZACK BLEEDING EYES: triggers at <40% HP — Zack's eyes bleed, power surges
+            if hasattr(_pchar, 'heat_mode') and not _pchar.heat_mode and not getattr(_pchar, 'heat_mode_triggered', False):
+                if _pchar.hp / _pchar.max_hp < 0.40:
+                    _pchar.heat_mode = True
+                    _pchar.heat_mode_triggered = True
+                    _pchar.temp_buffs.append({'name': 'BleedEyes', 'dmg_mult': 1.50, 'def_mult': 1.0, 'turns': 3})
+                    self.add_log(f"🩸🩸🩸 {_pchar.name}'s eyes START BLEEDING! Determination surges! +50% dmg for 3 turns!")
             # SELF-HATRED auto-trigger (Samuel Seo): triggers when HP < 40%
             if hasattr(_pchar, 'self_hatred_active') and not _pchar.self_hatred_active:
                 if _pchar.hp / _pchar.max_hp < 0.40:
                     _pchar.self_hatred_active = True
                     _pchar.temp_buffs.append({'name': 'SelfHatred', 'dmg_mult': 2.0, 'def_mult': 1.0, 'turns': 2})
                     self.add_log(f"💢💢💢 {_pchar.name}'s SELF-HATRED awakens below 40% HP! x2.0 dmg!")
+            # GUN PARK SHIRO ONI: handled in take_damage (like Last Stand)
 
 
     def cleanup(self):
@@ -2930,6 +3231,11 @@ class LookismGame:
                     self.add_log(f"{c.name}'s God Eye fades.")
                 else:
                     self.add_log(f"👁️ God Eye: {c.god_eye_timer} turns remaining.")
+
+            # SUBCONSCIOUSNESS cleanup (True Body Daniel) — clears when ui_mode ends
+            if getattr(c, 'subconsciousness_active', False) and not c.ui_mode:
+                c.subconsciousness_active = False
+                self.add_log(f"👁️ {c.name}'s Subconsciousness fades — consciousness returns.")
 
             # Veinous rage timer (MECH-7)
             if c.veinous_rage:
@@ -2996,10 +3302,45 @@ class LookismGame:
                     self.add_log(f"🦢 {c.name}'s Taekkyon rhythm broken!")
                 c.last_acted = False  # reset for next turn
 
+            # FIVE SENSES PATH PREDICTION — clear flag when buff gone + apply exhaustion
+            if getattr(c, 'path_prediction', False):
+                if not any(b['name'] == 'FiveSenses' for b in c.temp_buffs):
+                    c.path_prediction = False
+                    # EXHAUSTION DOWNSIDE: brain stress from maxing all five senses
+                    if getattr(c, 'five_senses_exhaustion_pending', False):
+                        c.exhausted = True
+                        c.five_senses_exhaustion_pending = False
+                        self.add_log(f"🧠 {c.name}'s brain reaches its limit after Five Senses — EXHAUSTED for 1 turn!")
+
             # HEAT MODE timer — managed by temp_buff expiry, just reset flag when expired
             if hasattr(c, 'heat_mode_active') and c.heat_mode_active:
                 if not any(b['name'] == 'HeatMode' for b in c.temp_buffs):
                     c.heat_mode_active = False
+
+            # VASCO RUNNER'S HIGH timer
+            if hasattr(c, 'runners_high') and c.runners_high:
+                if not any(b['name'] == 'RunnerHigh' for b in c.temp_buffs):
+                    c.runners_high = False
+                    self.add_log(f"👁️ {c.name}'s Runner's High fades — exhaustion sets in.")
+
+            # GUN PARK SHIRO ONI timer
+            if hasattr(c, 'uncontrolled_ui_active') and c.uncontrolled_ui_active:
+                if not any(b['name'] == 'ShiroOni' for b in c.temp_buffs):
+                    c.uncontrolled_ui_active = False
+                    self.add_log(f"⚫ {c.name}'s Shiro Oni form subsides — Yamazaki UI returns to normal.")
+
+            # SEONGJI MONSTER MODE: deactivate when MonsterMode temp_buff expires
+            if hasattr(c, 'monster_mode_active') and c.monster_mode_active:
+                if not any(b['name'] == 'MonsterMode' for b in c.temp_buffs):
+                    c.monster_mode_active = False
+                    self.add_log(f"🦍 {c.name}'s Monster Mode fades — he reins in his feral side.")
+
+            # VIN JIN GLASSES: reset to glasses_on when beast_mode expires
+            # Canon: Vin Jin CHOOSING to remove glasses is the power-up moment.
+            # After 3 turns the power fades and his restraint returns.
+            if hasattr(c, 'glasses_on') and not c.glasses_on and not c.beast_mode:
+                c.glasses_on = True
+                self.add_log(f"🕶️ {c.name} puts his sunglasses back on — restraint returns.")
 
             # DUAL BODY SYNC timer
             if hasattr(c, 'dual_sync_active') and c.dual_sync_active:
@@ -3060,6 +3401,25 @@ class LookismGame:
                     e.bound = False
 
         time.sleep(0.2)
+
+    # -------------------------------------------------------------------------
+    # calc_damage — shared helper for special ability types
+    # -------------------------------------------------------------------------
+    def calc_damage(self, character, target, ability_name, armor_break=False):
+        """Compute damage for special ability types (debilitate, clinch, patriarch, etc.)"""
+        # Find the ability by name in character's abilities
+        ability = None
+        for ab in character.abilities.values():
+            if ab.get('name') == ability_name:
+                ability = ab
+                break
+        if ability is None or 'dmg' not in ability:
+            # Fallback: use character base stats
+            base = random.randint(50, 80)
+        else:
+            base = random.randint(ability['dmg'][0], ability['dmg'][1])
+        mult, _ = character.get_damage_multiplier()
+        return int(base * mult), armor_break
 
     # -------------------------------------------------------------------------
     # DUAL BODY SYSTEM — Daniel Park specific
@@ -3196,7 +3556,7 @@ class LookismGame:
 
             passive_ab = {k: v for k, v in character.abilities.items() if v.get("type") == "passive"}
             damage_ab  = {k: v for k, v in available.items() if v.get("type") in ["damage", "counter"]}
-            buff_ab    = {k: v for k, v in available.items() if v.get("type") in ["buff", "ui", "body_swap", "dual_sync", "weakness_expose", "debilitate", "clinch", "dance"]}
+            buff_ab    = {k: v for k, v in available.items() if v.get("type") in ["buff", "ui", "body_swap", "dual_sync", "weakness_expose", "debilitate", "clinch", "dance", "five_senses"]}
             util_ab    = {k: v for k, v in available.items() if v.get("type") == "utility"}
 
             sort_key = lambda x: (0 if x.isdigit() else 1, int(x) if x.isdigit() else x)
@@ -3285,6 +3645,14 @@ class LookismGame:
                 if not target:
                     print("❌ No valid target.")
                     continue
+                # TRUE BODY SUBCONSCIOUSNESS: 30% friendly fire on infinity too
+                if getattr(character, 'subconsciousness_active', False):
+                    if random.random() < 0.30:
+                        allies = [c for c in self.party if c.is_alive() and c != character]
+                        if allies:
+                            original_target = target
+                            target = random.choice(allies)
+                            self.add_log(f"⚠️ SUBCONSCIOUSNESS INFINITY: Instincts fire at {target.name} instead of {original_target.name}!")
                 character.energy -= it['cost']
                 dmg = random.randint(it['dmg'][0], it['dmg'][1])
                 mult, buffs = character.get_damage_multiplier()
@@ -3328,7 +3696,40 @@ class LookismGame:
 
                 if atype == "ui":
                     if hasattr(character, 'activate_ui'):
-                        self.add_log(character.activate_ui())
+                        result = character.activate_ui()
+                        self.add_log(result)
+                        # Johan UI Copy — extra flavor
+                        if character.name == "Johan Seong":
+                            self.add_log("👁️ Johan fires ALL muscles and nerves simultaneously! Copies Daniel's UI physique! Only lasts 10 seconds in battle — 2 turns!")
+
+                elif atype == "five_senses":
+                    # TRUE BODY PATH: Five Senses Prediction
+                    # Best on True Body — full effect. On Perfect Body: partial (no exhaustion, weaker buff).
+                    is_true_body = hasattr(character, 'active_body') and character.active_body == 'true'
+                    if is_true_body:
+                        # Full Five Senses: -50% dmg taken, +30% dmg dealt, 3 turns, then exhausted
+                        character.temp_buffs.append({'name': 'FiveSenses', 'dmg_mult': 1.30, 'def_mult': 0.50, 'turns': 3})
+                        character.path_prediction = True
+                        character.five_senses_exhaustion_pending = True  # set exhausted when buff ends
+                        self.add_log(
+                            "\n" + "👁️" * 20 + "\n"
+                            f"👁️👁️👁️ FIVE SENSES PATH ACTIVATED! [TRUE BODY]\n"
+                            "👁️" * 20 + "\n"
+                            f"CANON: {character.name} maximizes all five senses simultaneously!\n"
+                            "Sees the PATH of every attack — predicts offense AND defense!\n"
+                            "Gun: 'He will be without equals if he can foresee defensive maneuvers.'\n"
+                            "Pacheon Jo: 'Not dodging — FORESEEING ALL my moves!'\n"
+                            "+30% dmg, -50% dmg taken for 3 turns. WARNING: Exhausted after!"
+                        )
+                    else:
+                        # Perfect Body: partial effect (possible but unconfirmed per VS Battles)
+                        character.temp_buffs.append({'name': 'FiveSenses', 'dmg_mult': 1.10, 'def_mult': 0.80, 'turns': 2})
+                        character.path_prediction = True
+                        self.add_log(
+                            f"👁️ FIVE SENSES PATH [PERFECT BODY]: Partial effect — "
+                            f"True Body's path, not confirmed for Perfect Body. "
+                            f"+10% dmg, -20% dmg taken for 2 turns."
+                        )
 
                 elif atype == "body_swap":
                     if hasattr(character, 'active_body'):
@@ -3447,6 +3848,15 @@ class LookismGame:
                         character.temp_buffs.append({'name': "HeroResolve", 'dmg_mult': 1.40, 'def_mult': 1.0, 'turns': 3})
                         character.heal(25)
                         self.add_log(f"🔥 HERO'S RESOLVE! {character.name} is fired up! +40% dmg, healed 25HP!")
+                    elif "Runner's High" in ability["name"] and hasattr(character, 'runners_high'):
+                        character.runners_high = True
+                        character.runners_high_timer = 2
+                        character.temp_buffs.append({'name': "RunnerHigh", 'dmg_mult': 2.0, 'def_mult': 1.0, 'turns': 2})
+                        self.add_log(f"👁️👁️👁️ RUNNER'S HIGH! {character.name}'s eyes go pale white! Brekdak Forbidden Move #1! x2.0 dmg for 2 turns! Sanity maintained!")
+                    elif "Shiro Oni" in ability["name"] and hasattr(character, 'uncontrolled_ui_active'):
+                        character.uncontrolled_ui_active = True
+                        character.temp_buffs.append({'name': "ShiroOni", 'dmg_mult': 1.0, 'def_mult': 1.0, 'turns': 3})
+                        self.add_log(f"⚫⚫⚫ SHIRO ONI — WHITE GHOST! {character.name}'s Yamazaki UI fully unleashes! x2.0 EXTRA damage for 3 turns! This is the power that earned him his name!")
                     elif "Iron Crown" in ability["name"]:
                         character.temp_buffs.append({'name': "IronCrown", 'dmg_mult': 1.40, 'def_mult': 0.70, 'turns': 2})
                         self.add_log(f"💢 IRON CROWN STANCE! {character.name} lowers head — +40% headbutt dmg, -30% dmg received for 2 turns!")
@@ -3460,6 +3870,7 @@ class LookismGame:
                         # Jinyoung: 3-hit mastery copy mode
                         character.temp_buffs.append({'name': "MastCopy", 'dmg_mult': 1.90, 'def_mult': 1.0, 'turns': 3})
                         self.add_log(f"🔄🔄🔄 MIRROR KING: MASTERY COPY! {character.name} copies a Gen 0 legend's physique! +90% dmg for 3 hits!")
+                    # Five Senses handled by 'five_senses' atype above — not in buff chain
                     elif "Ghost Form" in ability["name"] and hasattr(character, 'ghost_form_active'):
                         character.ghost_form_active = True
                         character.ghost_form_timer = 3
@@ -3520,10 +3931,11 @@ class LookismGame:
                         character.temp_buffs.append({'name': 'Tungsten Defense', 'dmg_mult': 1.0, 'def_mult': 0.3, 'turns': 1})
                         self.add_log(f"🛡️ {character.name}'s body becomes tungsten! -70% damage this turn!")
                     elif "Intimidation" in ability["name"]:
-                        # BUG-07 retained: 40% stun
+                        # Stun chance from ability desc (Ryuhei=45%, Logan=40%)
+                        stun_rate = 0.45 if character.name == "Ryuhei" else 0.40
                         stunned_any = False
                         for e in self.enemies:
-                            if e.is_alive() and random.random() < 0.4:
+                            if e.is_alive() and random.random() < stun_rate:
                                 e.stunned = True
                                 self.add_log(f"😤 {e.name} is intimidated and stunned!")
                                 stunned_any = True
@@ -3536,6 +3948,16 @@ class LookismGame:
                 elif atype in ["damage", "counter"]:
                     target = self.select_target()
                     if target:
+                        # TRUE BODY SUBCONSCIOUSNESS: 30% friendly fire (no friend/foe distinction)
+                        if getattr(character, 'subconsciousness_active', False):
+                            if random.random() < 0.30:
+                                allies = [c for c in self.party if c.is_alive() and c != character]
+                                if allies:
+                                    original_target = target
+                                    target = random.choice(allies)
+                                    self.add_log(f"⚠️ SUBCONSCIOUSNESS: {character.name}'s instincts have no friend/foe distinction! "
+                                                 f"Attack REDIRECTED to {target.name} instead of {original_target.name}!")
+
                         base_dmg = random.randint(ability["dmg"][0], ability["dmg"][1])
                         mult, buffs = character.get_damage_multiplier()
                         dmg = int(base_dmg * mult)
@@ -3600,9 +4022,16 @@ class LookismGame:
                                 self.add_log(f"⚡ {character.name}'s strike STUNS {target.name}!")
 
                         # RIGHT HAND PHILOSOPHY (Taesoo Ma): +20% dmg already in mult via get_damage_multiplier
-                        # but we show a message for flavor
                         if ability.get('right_hand'):
                             self.add_log(f"🔴 RIGHT HAND PHILOSOPHY: Taesoo fights as a man!")
+
+                        # GAPRYONG CONVICTION TO PROTECT: scales with living party members
+                        if "To Protect" in ability.get('name', '') and character.name == "Gapryong Kim":
+                            living = sum(1 for c in self.party if c.is_alive())
+                            if living > 1:
+                                protect_bonus = int(dmg * (living - 1) * 0.25)
+                                target.take_damage(protect_bonus, armor_break=True)
+                                self.add_log(f"👑 CONVICTION TO PROTECT! {living-1} comrades to protect — +{protect_bonus} bonus damage!")
 
                         # CONVICTION STACKS (Jinrang): each hit taken adds conviction
                         if ability.get('conviction') and hasattr(character, 'conviction_stacks'):
@@ -3634,6 +4063,21 @@ class LookismGame:
                                 weapon_dmg = int(dmg * 0.60)
                                 target.take_damage(weapon_dmg, armor_break=True)
                                 self.add_log(f"🐅 ANIMAL INSTINCT: Tom Lee grabs improvised weapon! +{weapon_dmg} extra damage!")
+
+                        # ELI IMPROVISED WEAPON: 25% chance after any attack
+                        if hasattr(character, 'improvised_weapon_chance') and target.is_alive():
+                            if random.random() < character.improvised_weapon_chance:
+                                weapon_dmg = int(dmg * 0.50)
+                                target.take_damage(weapon_dmg, armor_break=True)
+                                self.add_log(f"🐺 ELI grabs improvised weapon! +{weapon_dmg} bonus dmg!")
+
+                        # JOHAN GOD EYE: 25% armor_break on all attacks while active
+                        if hasattr(character, 'god_eye_active') and character.god_eye_active and not armor_break:
+                            if random.random() < 0.25:
+                                # Retroactively re-apply the hit as armor_break for bonus damage
+                                extra = int(dmg * 0.20)  # ~20% extra through defenses
+                                target.take_damage(extra, armor_break=True)
+                                self.add_log(f"👁️ GOD EYE MULTI-ARC: strike arc penetrates defense! +{extra} dmg!")
 
                         # GANG BACKUP Ryuhei
                         if hasattr(character, 'gang_backup_chance') and target.is_alive():
@@ -4158,7 +4602,7 @@ class LookismGame:
             ("Samuel Seo",          lambda: [create_enemy_samuel_seo()]),
             ("Gun Park",            lambda: [create_enemy_gun_park_enemy()]),
             ("Goo Kim",             lambda: [create_enemy_goo_kim_enemy()]),
-            ("Kim Jun-gu",          lambda: [create_enemy_kim_jungu_enemy()]),
+            ("Goo Kim (Armed)",     lambda: [create_enemy_kim_jungu_enemy()]),
             ("Manager Kim",         lambda: [create_enemy_manager_kim_enemy()])
         ]
 
@@ -4202,7 +4646,7 @@ class LookismGame:
             ("Jichang Kwak", lambda: [create_enemy_jichang_kwak()]),
             ("Gun Park",     lambda: [create_enemy_gun_park_enemy()]),
             ("Goo Kim",      lambda: [create_enemy_goo_kim_enemy()]),
-            ("Kim Jun-gu",   lambda: [create_enemy_kim_jungu_enemy()]),
+            ("Goo Kim (Armed)",   lambda: [create_enemy_kim_jungu_enemy()]),
             ("Manager Kim",  lambda: [create_enemy_manager_kim_enemy()]),
             ("Jinrang",      lambda: [create_enemy_jinrang_enemy()]),
             ("Jaegyeon Na",  lambda: [create_enemy_jaegyeon_na_enemy()]),
@@ -4310,7 +4754,7 @@ class LookismGame:
             ("18", "Jichang Kwak",   create_enemy_jichang_kwak),
             ("19", "Gun Park",       create_enemy_gun_park_enemy),
             ("20", "Goo Kim",        create_enemy_goo_kim_enemy),
-            ("21", "Kim Jun-gu",     create_enemy_kim_jungu_enemy),
+            ("21", "Goo Kim (Armed)",create_enemy_kim_jungu_enemy),
             ("22", "Manager Kim",    create_enemy_manager_kim_enemy),
             ("23", "Jinrang",        create_enemy_jinrang_enemy),
             ("24", "Jaegyeon Na",    create_enemy_jaegyeon_na_enemy),
